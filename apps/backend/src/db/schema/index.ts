@@ -48,6 +48,7 @@ import { tenants } from './tenants';
 import {
   partnerBillingPlans,
   partnerSubscriptions,
+  partnerBillingInvoices,
   partnerApiKeys,
   partnerWebhooks,
 } from './commercial';
@@ -90,6 +91,7 @@ export const schema = {
   tenants,
   partnerBillingPlans,
   partnerSubscriptions,
+  partnerBillingInvoices,
   partnerApiKeys,
   partnerWebhooks,
   serviceTimelines,

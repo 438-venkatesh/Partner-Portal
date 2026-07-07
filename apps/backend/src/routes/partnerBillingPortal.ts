@@ -11,4 +11,11 @@ export async function partnerBillingPortalRoutes(fastify: FastifyInstance) {
     const sub = await billingService.getPartnerSubscription(partnerId);
     return reply.send({ subscription: sub });
   });
+
+  fastify.get('/invoices', async (request, reply) => {
+    const partnerId = request.partnerUser?.partnerId;
+    if (!partnerId) return reply.code(401).send({ error: 'Unauthorized' });
+    const invoices = await billingService.listInvoicesForPartner(partnerId);
+    return reply.send({ invoices });
+  });
 }

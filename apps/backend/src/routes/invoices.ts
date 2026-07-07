@@ -1,6 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { invoiceService } from '../services/invoiceService';
 import { authenticate } from '../middleware/auth';
+import { requireOperationsDbRole } from '../middleware/requireRole';
 import { z } from 'zod';
 import { zodToFastifySchema } from '../utils/schemaConverter';
 
@@ -32,6 +33,7 @@ export async function invoiceRoutes(fastify: FastifyInstance) {
 
   // Create invoice
   fastify.post('/suppliers/:supplierId/invoices', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
     schema: {
       params: zodToFastifySchema(z.object({ supplierId: z.string().uuid() })),
       body: zodToFastifySchema(z.object({
@@ -68,6 +70,7 @@ export async function invoiceRoutes(fastify: FastifyInstance) {
 
   // Update invoice
   fastify.put('/invoices/:invoiceId', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
     schema: {
       params: zodToFastifySchema(z.object({ invoiceId: z.string().uuid() })),
       body: zodToFastifySchema(z.object({
@@ -92,6 +95,7 @@ export async function invoiceRoutes(fastify: FastifyInstance) {
 
   // Send invoice
   fastify.post('/invoices/:invoiceId/send', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
     schema: {
       params: zodToFastifySchema(z.object({ invoiceId: z.string().uuid() })),
     },
@@ -102,6 +106,7 @@ export async function invoiceRoutes(fastify: FastifyInstance) {
 
   // Record payment
   fastify.post('/invoices/:invoiceId/payments', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
     schema: {
       params: zodToFastifySchema(z.object({ invoiceId: z.string().uuid() })),
       body: zodToFastifySchema(z.object({

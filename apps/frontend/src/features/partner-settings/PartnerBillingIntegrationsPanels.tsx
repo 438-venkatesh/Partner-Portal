@@ -30,43 +30,94 @@ export function SubscriptionSettingsPanel() {
     queryKey: ['partner-billing-subscription'],
     queryFn: () => partnerBillingApi.getSubscription(),
   });
+  const { data: invoices, isLoading: invoicesLoading } = useQuery({
+    queryKey: ['partner-billing-invoices'],
+    queryFn: () => partnerBillingApi.listInvoices(),
+  });
 
   const sub = data?.subscription;
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Subscription</CardTitle>
-        <CardDescription>Current billing plan for your organization.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        {isLoading && <p className="text-sm text-muted-foreground">Loading…</p>}
-        {error && (
-          <p className="text-sm text-destructive">Could not load subscription.</p>
-        )}
-        {!isLoading && !error && !sub && (
-          <p className="text-sm text-muted-foreground">No subscription assigned yet.</p>
-        )}
-        {!isLoading && !error && sub && (
-          <dl className="grid gap-2 text-sm">
-            <div className="flex justify-between gap-4">
-              <dt className="text-muted-foreground">Status</dt>
-              <dd>
-                <Badge variant="outline">{sub.status}</Badge>
-              </dd>
-            </div>
-            <div className="flex justify-between gap-4">
-              <dt className="text-muted-foreground">Billing cycle</dt>
-              <dd>{sub.billingCycle}</dd>
-            </div>
-            <div className="flex justify-between gap-4">
-              <dt className="text-muted-foreground">Plan ID</dt>
-              <dd className="font-mono text-xs break-all">{sub.planId}</dd>
-            </div>
-          </dl>
-        )}
-      </CardContent>
-    </Card>
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Subscription</CardTitle>
+          <CardDescription>Current billing plan for your organization.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {isLoading && <p className="text-sm text-muted-foreground">Loading…</p>}
+          {error && (
+            <p className="text-sm text-destructive">Could not load subscription.</p>
+          )}
+          {!isLoading && !error && !sub && (
+            <p className="text-sm text-muted-foreground">No subscription assigned yet.</p>
+          )}
+          {!isLoading && !error && sub && (
+            <dl className="grid gap-2 text-sm">
+              <div className="flex justify-between gap-4">
+                <dt className="text-muted-foreground">Status</dt>
+                <dd>
+                  <Badge variant="outline">{sub.status}</Badge>
+                </dd>
+              </div>
+              <div className="flex justify-between gap-4">
+                <dt className="text-muted-foreground">Billing cycle</dt>
+                <dd>{sub.billingCycle}</dd>
+              </div>
+              <div className="flex justify-between gap-4">
+                <dt className="text-muted-foreground">Plan ID</dt>
+                <dd className="font-mono text-xs break-all">{sub.planId}</dd>
+              </div>
+            </dl>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Invoices</CardTitle>
+          <CardDescription>Amounts due for your subscription each billing period.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {invoicesLoading && <p className="text-sm text-muted-foreground">Loading…</p>}
+          {!invoicesLoading && (invoices ?? []).length === 0 && (
+            <p className="text-sm text-muted-foreground">No invoices yet.</p>
+          )}
+          {!invoicesLoading && (invoices ?? []).length > 0 && (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Plan</TableHead>
+                  <TableHead>Period</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>Due</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {(invoices ?? []).map((inv) => (
+                  <TableRow key={inv.invoiceId}>
+                    <TableCell>{inv.planName}</TableCell>
+                    <TableCell className="text-xs text-muted-foreground">
+                      {inv.periodStart} – {inv.periodEnd}
+                    </TableCell>
+                    <TableCell>
+                      {(inv.amountCents / 100).toFixed(2)} {inv.currency}
+                    </TableCell>
+                    <TableCell className="text-xs">{inv.dueDate}</TableCell>
+                    <TableCell>
+                      <Badge variant={inv.status === 'paid' ? 'success' : 'outline'} className="capitalize">
+                        {inv.status}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }
 

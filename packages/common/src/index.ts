@@ -14,5 +14,6 @@ export * from './schemas/training';
 export * from './schemas/enablement';
 export * from './schemas/comarketing';
 export * from './schemas/compliance';
+export * from './schemas/billing';
 export * from './partnerOnboardingByType';
 

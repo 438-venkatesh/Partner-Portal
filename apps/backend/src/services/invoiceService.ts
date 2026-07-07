@@ -180,6 +180,11 @@ export const invoiceService = {
     return invoice;
   },
 
+  /**
+   * Wrapped in a transaction with a row lock on the invoice: two concurrent payments (a
+   * double-click, a duplicate webhook) must not both read the same stale paidAmount and clobber
+   * each other's update. A repeated transactionId for the same invoice is rejected outright.
+   */
   async recordPayment(invoiceId: string, data: {
     paymentAmount: number;
     paymentDate: string;
@@ -188,33 +193,50 @@ export const invoiceService = {
     transactionId?: string;
     notes?: string;
   }, user: any) {
-    // Create payment record
-    const [payment] = await db
-      .insert(invoicePayments)
-      .values({
-        invoiceId,
-        paymentAmount: data.paymentAmount.toString(),
-        paymentDate: new Date(data.paymentDate),
-        paymentMethod: data.paymentMethod,
-        paymentReference: data.paymentReference,
-        transactionId: data.transactionId,
-        notes: data.notes,
-        status: 'paid',
-        processedBy: user.userId,
-        processedAt: new Date(),
-      })
-      .returning();
+    return db.transaction(async (tx) => {
+      if (data.transactionId) {
+        const [duplicate] = await tx
+          .select({ paymentId: invoicePayments.paymentId })
+          .from(invoicePayments)
+          .where(
+            and(
+              eq(invoicePayments.invoiceId, invoiceId),
+              eq(invoicePayments.transactionId, data.transactionId)
+            )
+          )
+          .limit(1);
+        if (duplicate) {
+          throw new Error('A payment with this transaction ID has already been recorded for this invoice');
+        }
+      }
 
-    // Update invoice payment status
-    const [invoice] = await db
-      .select()
-      .from(supplierInvoices)
-      .where(eq(supplierInvoices.invoiceId, invoiceId))
-      .limit(1);
+      const [invoice] = await tx
+        .select()
+        .from(supplierInvoices)
+        .where(eq(supplierInvoices.invoiceId, invoiceId))
+        .for('update')
+        .limit(1);
+      if (!invoice) {
+        throw new Error('Invoice not found');
+      }
 
-    if (invoice) {
-      const currentPaid = parseFloat(invoice.paidAmount || '0');
-      const newPaid = currentPaid + data.paymentAmount;
+      const [payment] = await tx
+        .insert(invoicePayments)
+        .values({
+          invoiceId,
+          paymentAmount: data.paymentAmount.toString(),
+          paymentDate: new Date(data.paymentDate),
+          paymentMethod: data.paymentMethod,
+          paymentReference: data.paymentReference,
+          transactionId: data.transactionId,
+          notes: data.notes,
+          status: 'paid',
+          processedBy: user.userId,
+          processedAt: new Date(),
+        })
+        .returning();
+
+      const newPaid = parseFloat(invoice.paidAmount || '0') + data.paymentAmount;
       const totalAmount = parseFloat(invoice.totalAmount || '0');
 
       let paymentStatus: 'pending' | 'partial' | 'paid' = 'pending';
@@ -224,7 +246,7 @@ export const invoiceService = {
         paymentStatus = 'partial';
       }
 
-      await db
+      await tx
         .update(supplierInvoices)
         .set({
           paidAmount: newPaid.toString(),
@@ -234,9 +256,9 @@ export const invoiceService = {
           updatedAt: new Date(),
         })
         .where(eq(supplierInvoices.invoiceId, invoiceId));
-    }
 
-    return payment;
+      return payment;
+    });
   },
 
   async getInvoicePayments(invoiceId: string) {
