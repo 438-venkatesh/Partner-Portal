@@ -22,6 +22,7 @@ import { Route as PartnerOperationsIndexRouteImport } from './routes/partner-ope
 import { Route as LogisticsIndexRouteImport } from './routes/logistics/index'
 import { Route as EnablementIndexRouteImport } from './routes/enablement/index'
 import { Route as DirectoryIndexRouteImport } from './routes/directory/index'
+import { Route as ComplianceIndexRouteImport } from './routes/compliance/index'
 import { Route as ComarketingIndexRouteImport } from './routes/comarketing/index'
 import { Route as BillingIndexRouteImport } from './routes/billing/index'
 import { Route as AccountMappingIndexRouteImport } from './routes/account-mapping/index'
@@ -41,6 +42,7 @@ import { Route as PartnerServicesRouteImport } from './routes/partner/services'
 import { Route as PartnerRevenueRouteImport } from './routes/partner/revenue'
 import { Route as PartnerResendVerificationRouteImport } from './routes/partner/resend-verification'
 import { Route as PartnerRegisterRouteImport } from './routes/partner/register'
+import { Route as PartnerPrivacyRouteImport } from './routes/partner/privacy'
 import { Route as PartnerOnboardingRouteImport } from './routes/partner/onboarding'
 import { Route as PartnerLoginRouteImport } from './routes/partner/login'
 import { Route as PartnerForgotPasswordRouteImport } from './routes/partner/forgot-password'
@@ -132,6 +134,11 @@ const EnablementIndexRoute = EnablementIndexRouteImport.update({
 const DirectoryIndexRoute = DirectoryIndexRouteImport.update({
   id: '/directory/',
   path: '/directory/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComplianceIndexRoute = ComplianceIndexRouteImport.update({
+  id: '/compliance/',
+  path: '/compliance/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ComarketingIndexRoute = ComarketingIndexRouteImport.update({
@@ -228,6 +235,11 @@ const PartnerResendVerificationRoute =
 const PartnerRegisterRoute = PartnerRegisterRouteImport.update({
   id: '/partner/register',
   path: '/partner/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PartnerPrivacyRoute = PartnerPrivacyRouteImport.update({
+  id: '/partner/privacy',
+  path: '/partner/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PartnerOnboardingRoute = PartnerOnboardingRouteImport.update({
@@ -398,6 +410,7 @@ export interface FileRoutesByFullPath {
   '/partner/forgot-password': typeof PartnerForgotPasswordRoute
   '/partner/login': typeof PartnerLoginRoute
   '/partner/onboarding': typeof PartnerOnboardingRouteWithChildren
+  '/partner/privacy': typeof PartnerPrivacyRoute
   '/partner/register': typeof PartnerRegisterRoute
   '/partner/resend-verification': typeof PartnerResendVerificationRoute
   '/partner/revenue': typeof PartnerRevenueRoute
@@ -417,6 +430,7 @@ export interface FileRoutesByFullPath {
   '/account-mapping': typeof AccountMappingIndexRoute
   '/billing': typeof BillingIndexRoute
   '/comarketing': typeof ComarketingIndexRoute
+  '/compliance': typeof ComplianceIndexRoute
   '/directory': typeof DirectoryIndexRoute
   '/enablement': typeof EnablementIndexRoute
   '/logistics': typeof LogisticsIndexRoute
@@ -460,6 +474,7 @@ export interface FileRoutesByTo {
   '/partner/forgot-password': typeof PartnerForgotPasswordRoute
   '/partner/login': typeof PartnerLoginRoute
   '/partner/onboarding': typeof PartnerOnboardingRouteWithChildren
+  '/partner/privacy': typeof PartnerPrivacyRoute
   '/partner/register': typeof PartnerRegisterRoute
   '/partner/resend-verification': typeof PartnerResendVerificationRoute
   '/partner/revenue': typeof PartnerRevenueRoute
@@ -478,6 +493,7 @@ export interface FileRoutesByTo {
   '/account-mapping': typeof AccountMappingIndexRoute
   '/billing': typeof BillingIndexRoute
   '/comarketing': typeof ComarketingIndexRoute
+  '/compliance': typeof ComplianceIndexRoute
   '/directory': typeof DirectoryIndexRoute
   '/enablement': typeof EnablementIndexRoute
   '/logistics': typeof LogisticsIndexRoute
@@ -522,6 +538,7 @@ export interface FileRoutesById {
   '/partner/forgot-password': typeof PartnerForgotPasswordRoute
   '/partner/login': typeof PartnerLoginRoute
   '/partner/onboarding': typeof PartnerOnboardingRouteWithChildren
+  '/partner/privacy': typeof PartnerPrivacyRoute
   '/partner/register': typeof PartnerRegisterRoute
   '/partner/resend-verification': typeof PartnerResendVerificationRoute
   '/partner/revenue': typeof PartnerRevenueRoute
@@ -541,6 +558,7 @@ export interface FileRoutesById {
   '/account-mapping/': typeof AccountMappingIndexRoute
   '/billing/': typeof BillingIndexRoute
   '/comarketing/': typeof ComarketingIndexRoute
+  '/compliance/': typeof ComplianceIndexRoute
   '/directory/': typeof DirectoryIndexRoute
   '/enablement/': typeof EnablementIndexRoute
   '/logistics/': typeof LogisticsIndexRoute
@@ -586,6 +604,7 @@ export interface FileRouteTypes {
     | '/partner/forgot-password'
     | '/partner/login'
     | '/partner/onboarding'
+    | '/partner/privacy'
     | '/partner/register'
     | '/partner/resend-verification'
     | '/partner/revenue'
@@ -605,6 +624,7 @@ export interface FileRouteTypes {
     | '/account-mapping'
     | '/billing'
     | '/comarketing'
+    | '/compliance'
     | '/directory'
     | '/enablement'
     | '/logistics'
@@ -648,6 +668,7 @@ export interface FileRouteTypes {
     | '/partner/forgot-password'
     | '/partner/login'
     | '/partner/onboarding'
+    | '/partner/privacy'
     | '/partner/register'
     | '/partner/resend-verification'
     | '/partner/revenue'
@@ -666,6 +687,7 @@ export interface FileRouteTypes {
     | '/account-mapping'
     | '/billing'
     | '/comarketing'
+    | '/compliance'
     | '/directory'
     | '/enablement'
     | '/logistics'
@@ -709,6 +731,7 @@ export interface FileRouteTypes {
     | '/partner/forgot-password'
     | '/partner/login'
     | '/partner/onboarding'
+    | '/partner/privacy'
     | '/partner/register'
     | '/partner/resend-verification'
     | '/partner/revenue'
@@ -728,6 +751,7 @@ export interface FileRouteTypes {
     | '/account-mapping/'
     | '/billing/'
     | '/comarketing/'
+    | '/compliance/'
     | '/directory/'
     | '/enablement/'
     | '/logistics/'
@@ -772,6 +796,7 @@ export interface RootRouteChildren {
   PartnerForgotPasswordRoute: typeof PartnerForgotPasswordRoute
   PartnerLoginRoute: typeof PartnerLoginRoute
   PartnerOnboardingRoute: typeof PartnerOnboardingRouteWithChildren
+  PartnerPrivacyRoute: typeof PartnerPrivacyRoute
   PartnerRegisterRoute: typeof PartnerRegisterRoute
   PartnerResendVerificationRoute: typeof PartnerResendVerificationRoute
   PartnerRevenueRoute: typeof PartnerRevenueRoute
@@ -791,6 +816,7 @@ export interface RootRouteChildren {
   AccountMappingIndexRoute: typeof AccountMappingIndexRoute
   BillingIndexRoute: typeof BillingIndexRoute
   ComarketingIndexRoute: typeof ComarketingIndexRoute
+  ComplianceIndexRoute: typeof ComplianceIndexRoute
   DirectoryIndexRoute: typeof DirectoryIndexRoute
   EnablementIndexRoute: typeof EnablementIndexRoute
   LogisticsIndexRoute: typeof LogisticsIndexRoute
@@ -897,6 +923,13 @@ declare module '@tanstack/react-router' {
       path: '/directory'
       fullPath: '/directory'
       preLoaderRoute: typeof DirectoryIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compliance/': {
+      id: '/compliance/'
+      path: '/compliance'
+      fullPath: '/compliance'
+      preLoaderRoute: typeof ComplianceIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/comarketing/': {
@@ -1030,6 +1063,13 @@ declare module '@tanstack/react-router' {
       path: '/partner/register'
       fullPath: '/partner/register'
       preLoaderRoute: typeof PartnerRegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/partner/privacy': {
+      id: '/partner/privacy'
+      path: '/partner/privacy'
+      fullPath: '/partner/privacy'
+      preLoaderRoute: typeof PartnerPrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/partner/onboarding': {
@@ -1339,6 +1379,7 @@ const rootRouteChildren: RootRouteChildren = {
   PartnerForgotPasswordRoute: PartnerForgotPasswordRoute,
   PartnerLoginRoute: PartnerLoginRoute,
   PartnerOnboardingRoute: PartnerOnboardingRouteWithChildren,
+  PartnerPrivacyRoute: PartnerPrivacyRoute,
   PartnerRegisterRoute: PartnerRegisterRoute,
   PartnerResendVerificationRoute: PartnerResendVerificationRoute,
   PartnerRevenueRoute: PartnerRevenueRoute,
@@ -1358,6 +1399,7 @@ const rootRouteChildren: RootRouteChildren = {
   AccountMappingIndexRoute: AccountMappingIndexRoute,
   BillingIndexRoute: BillingIndexRoute,
   ComarketingIndexRoute: ComarketingIndexRoute,
+  ComplianceIndexRoute: ComplianceIndexRoute,
   DirectoryIndexRoute: DirectoryIndexRoute,
   EnablementIndexRoute: EnablementIndexRoute,
   LogisticsIndexRoute: LogisticsIndexRoute,

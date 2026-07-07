@@ -95,7 +95,8 @@ export function AgreementStagePanel({
   });
 
   const signMutation = useMutation({
-    mutationFn: (agreementId: string) => partnerAgreementsApi.sign(agreementId),
+    mutationFn: ({ agreementId, fullName }: { agreementId: string; fullName: string }) =>
+      partnerAgreementsApi.sign(agreementId, fullName),
     onSuccess: () => {
       setSignTarget(null);
       toast({ title: 'Agreement signed' });
@@ -286,8 +287,8 @@ export function AgreementStagePanel({
         agreementTitle={signTarget?.title ?? 'Agreement'}
         agreementNumber={signTarget?.agreementNumber}
         isPending={signMutation.isPending}
-        onConfirm={() => {
-          if (signTarget) signMutation.mutate(signTarget.agreementId);
+        onConfirm={(fullName) => {
+          if (signTarget) signMutation.mutate({ agreementId: signTarget.agreementId, fullName });
         }}
       />
     </div>

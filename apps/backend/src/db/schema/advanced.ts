@@ -133,6 +133,10 @@ export const partnerAgreements = pgTable('partner_agreements', {
   partnerSignedAt: timestamp('partner_signed_at'),
   tenantSignedAt: timestamp('tenant_signed_at'),
   platformSignedAt: timestamp('platform_signed_at'),
+  /** Typed-name e-signature capture — the partner-side "sign" action records who typed what, from where. */
+  partnerSignatureName: varchar('partner_signature_name', { length: 255 }),
+  partnerSignatureIp: varchar('partner_signature_ip', { length: 45 }),
+  partnerSignatureUserAgent: varchar('partner_signature_user_agent', { length: 500 }),
   eSignatureProvider: varchar('e_signature_provider', { length: 50 }),
   eSignatureDocumentId: varchar('e_signature_document_id', { length: 255 }),
   notes: text('notes'),
@@ -158,6 +162,8 @@ export const activityTypeEnum = pgEnum('activity_type', [
   'onboarding_stage_completed',
   'partner_offboarded',
   'tier_changed',
+  'document_deleted',
+  'login',
   'other'
 ]);
 

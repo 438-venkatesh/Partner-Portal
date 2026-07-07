@@ -106,10 +106,11 @@ export async function partnerDocumentsPortalRoutes(fastify: FastifyInstance) {
     },
   }, async (request, reply) => {
     const partnerId = request.partnerUser?.partnerId;
-    if (!partnerId) return reply.code(401).send({ error: 'Unauthorized' });
+    const accountId = request.partnerUser?.accountId;
+    if (!partnerId || !accountId) return reply.code(401).send({ error: 'Unauthorized' });
 
     try {
-      await documentService.deleteDocumentForPartner(request.params.documentId, partnerId);
+      await documentService.deleteDocumentForPartner(request.params.documentId, partnerId, accountId);
       return reply.code(204).send();
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to delete document';
@@ -121,22 +122,15 @@ export async function partnerDocumentsPortalRoutes(fastify: FastifyInstance) {
   fastify.get('/:documentId/access', {
     schema: {
       params: zodToFastifySchema(z.object({ documentId: z.string().uuid() })),
-      querystring: zodToFastifySchema(
-        z.object({
-          disposition: z.enum(['inline', 'attachment']).optional(),
-        })
-      ),
     },
   }, async (request, reply) => {
     const partnerId = request.partnerUser?.partnerId;
     if (!partnerId) return reply.code(401).send({ error: 'Unauthorized' });
 
     try {
-      const disposition = request.query.disposition ?? 'inline';
       const url = await documentService.getDocumentAccessUrlForPartner(
         request.params.documentId,
-        partnerId,
-        { disposition }
+        partnerId
       );
       return reply.send({ url });
     } catch (error) {

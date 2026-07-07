@@ -23,6 +23,7 @@ import {
   Truck,
   GraduationCap,
   Megaphone,
+  ShieldCheck,
 } from 'lucide-react';
 import { usePartnerAuthStore } from '@/lib/stores/partnerAuthStore';
 import { partnerDashboardApi } from '@/lib/api/partnerDashboard';
@@ -171,6 +172,7 @@ export function PartnerSidebar() {
       items: [
         { to: '/partner/documents', label: 'Documents', icon: Files },
         { to: '/partner/agreements', label: 'Agreements', icon: Handshake },
+        { to: '/partner/privacy', label: 'Privacy', icon: ShieldCheck },
       ],
     },
     {

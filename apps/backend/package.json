@@ -23,6 +23,7 @@
     "onboarding:send-reminders": "tsx scripts/send-onboarding-reminders.ts",
     "onboarding:purge-expired-partners": "tsx scripts/purge-expired-partners.ts",
     "deals:expire-protections": "tsx scripts/expire-deal-protections.ts",
+    "contracts:send-agreement-reminders": "tsx scripts/send-agreement-reminders.ts",
     "test": "vitest run",
     "test:upload": "tsx scripts/test-document-upload.ts"
   },

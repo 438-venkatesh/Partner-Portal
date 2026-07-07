@@ -8,12 +8,10 @@
  * Run: pnpm --filter @partner-portal/backend exec tsx scripts/purge-expired-partners.ts
  */
 import 'dotenv/config';
-import { and, eq, isNotNull, isNull, sql } from 'drizzle-orm';
+import { and, isNotNull, isNull, sql } from 'drizzle-orm';
 import { db } from '../src/db';
 import { partners } from '../src/db/schema/partners';
-import { partnerUserAccounts } from '../src/db/schema/partnerAuth';
-
-const REDACTED_NAME = 'Redacted Partner';
+import { anonymizePartnerPii } from '../src/services/dataPrivacyService';
 
 async function main() {
   const candidates = await db
@@ -30,38 +28,7 @@ async function main() {
   console.log(`Found ${candidates.length} partner(s) past their retention window.`);
 
   for (const partner of candidates) {
-    await db
-      .update(partners)
-      .set({
-        partnerName: `${REDACTED_NAME} ${partner.partnerCode}`,
-        displayName: null,
-        website: null,
-        description: null,
-        logoUrl: null,
-        metadata: {},
-        piiPurgedAt: new Date(),
-        updatedAt: new Date(),
-      })
-      .where(eq(partners.partnerId, partner.partnerId));
-
-    const accounts = await db
-      .select({ accountId: partnerUserAccounts.accountId })
-      .from(partnerUserAccounts)
-      .where(eq(partnerUserAccounts.partnerId, partner.partnerId));
-
-    for (const account of accounts) {
-      // Email has a unique constraint — key the redacted address off the account, not the partner.
-      await db
-        .update(partnerUserAccounts)
-        .set({
-          firstName: 'Redacted',
-          lastName: 'Redacted',
-          email: `redacted+${account.accountId}@purged.invalid`,
-          phone: null,
-        })
-        .where(eq(partnerUserAccounts.accountId, account.accountId));
-    }
-
+    await anonymizePartnerPii(partner.partnerId);
     console.log(`  Purged PII for partner ${partner.partnerId} (${partner.partnerCode}).`);
   }
 

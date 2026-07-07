@@ -205,6 +205,36 @@ export const cloudinaryService = {
     return Buffer.from(await response.arrayBuffer());
   },
 
+  /**
+   * A genuinely time-limited, signed download link — unlike `getDocumentDeliveryUrl`, which
+   * deliberately returns the permanent public URL for inline viewing. Use this wherever a link
+   * is handed to a client to hold onto (rather than fetched and served by our own backend), so a
+   * leaked/bookmarked link stops working once CLOUDINARY_URL_TTL_SECONDS elapses. Always forces
+   * an attachment-style download (Cloudinary's Admin API private-download links don't support
+   * inline rendering), which is fine here since in-app viewing already goes through the
+   * `/content` proxy, not this method.
+   */
+  getSignedDownloadUrl(
+    publicId: string,
+    opts: { mimeType?: string | null; secureUrl?: string | null }
+  ): string {
+    ensureConfigured();
+
+    const resourceType =
+      (opts.secureUrl ? resourceTypeFromDeliveryUrl(opts.secureUrl) : null) ||
+      resourceTypeForMime(opts.mimeType || 'application/octet-stream');
+    const extension =
+      publicId.includes('.') ? (publicId.split('.').pop() || '') : mimeToExtension(opts.mimeType);
+    const expiresAt =
+      Math.floor(Date.now() / 1000) + Number(process.env.CLOUDINARY_URL_TTL_SECONDS || 3600);
+
+    return cloudinary.utils.private_download_url(publicId, extension, {
+      resource_type: resourceType,
+      type: 'upload',
+      expires_at: expiresAt,
+    });
+  },
+
   async deleteStoredDocument(
     publicId: string,
     opts: { mimeType?: string | null; secureUrl?: string | null }

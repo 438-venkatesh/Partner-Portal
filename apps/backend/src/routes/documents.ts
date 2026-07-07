@@ -2,6 +2,7 @@ import { FastifyInstance } from 'fastify';
 import { eq } from 'drizzle-orm';
 import { documentService } from '../services/documentService';
 import { authenticate } from '../middleware/auth';
+import { requireOperationsDbRole } from '../middleware/requireRole';
 import { z } from 'zod';
 import { zodToFastifySchema } from '../utils/schemaConverter';
 import { collectMultipartUpload, trimField } from '../utils/readMultipartField';
@@ -112,22 +113,14 @@ export async function documentRoutes(fastify: FastifyInstance) {
     }
   });
 
-  // Signed Cloudinary URL for view or download
+  // Signed, time-limited Cloudinary download URL
   fastify.get('/:documentId/access', {
     schema: {
       params: zodToFastifySchema(z.object({ documentId: z.string().uuid() })),
-      querystring: zodToFastifySchema(
-        z.object({
-          disposition: z.enum(['inline', 'attachment']).optional(),
-        })
-      ),
     },
   }, async (request, reply) => {
     try {
-      const disposition = request.query.disposition ?? 'inline';
-      const url = await documentService.getDocumentAccessUrl(request.params.documentId, {
-        disposition,
-      });
+      const url = await documentService.getDocumentAccessUrl(request.params.documentId);
       return reply.send({ url });
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to get document URL';
@@ -147,12 +140,16 @@ export async function documentRoutes(fastify: FastifyInstance) {
   });
 
   fastify.delete('/:documentId', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
     schema: {
       params: zodToFastifySchema(z.object({ documentId: z.string().uuid() })),
     },
   }, async (request, reply) => {
     try {
-      await documentService.deleteDocument(request.params.documentId);
+      await documentService.deleteDocument(request.params.documentId, {
+        userId: request.user!.userId!,
+        type: 'platform_admin',
+      });
       return reply.code(204).send();
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to delete document';
@@ -163,6 +160,7 @@ export async function documentRoutes(fastify: FastifyInstance) {
 
   // Verify document
   fastify.post('/:documentId/verify', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
     schema: {
       params: zodToFastifySchema(z.object({ documentId: z.string().uuid() })),
       body: zodToFastifySchema(z.object({

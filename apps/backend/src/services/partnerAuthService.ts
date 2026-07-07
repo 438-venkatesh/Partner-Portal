@@ -7,6 +7,7 @@ import jwt from 'jsonwebtoken';
 import { emailService } from './emailService';
 import { assertStrongPassword } from '../utils/passwordPolicy';
 import { ensureSupplierOnboarding, isSupplierPartnerType } from './supplierOnboardingBootstrap';
+import { logPartnerActivity } from '../utils/activityLogger';
 
 const PARTNER_ACCESS_EXPIRES = '15m';
 const PARTNER_REFRESH_DAYS = 30;
@@ -548,6 +549,19 @@ export const partnerAuthService = {
         refreshTokenExpiresAt: refreshExpires,
       })
       .where(eq(partnerUserAccounts.accountId, account.account.accountId));
+
+    try {
+      await logPartnerActivity({
+        partnerId: account.partner.partnerId,
+        activityType: 'login',
+        activityDescription: `${account.account.email} logged in.`,
+        performedBy: account.account.accountId,
+        performedByType: 'partner_user',
+        ipAddress: clientIp,
+      });
+    } catch {
+      /* non-fatal — never block login on audit logging */
+    }
 
     return {
       accessToken,

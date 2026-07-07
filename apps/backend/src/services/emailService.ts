@@ -165,4 +165,18 @@ ${reason ? `<p>Reason: ${escapeHtml(reason)}</p>` : ''}`
     );
     return send({ to, subject: `Still there? Finish setting up ${opts.partnerName}`, html });
   },
+
+  async sendAgreementExpiring(
+    to: string,
+    opts: { partnerName: string; agreementTitle: string; agreementNumber: string; daysUntilExpiry: number }
+  ) {
+    const base = publicWebBaseUrl();
+    const html = wrapHtml(
+      'Your agreement is expiring soon',
+      `<p><strong>${escapeHtml(opts.agreementTitle)}</strong> (<span style="font-family:monospace;">${escapeHtml(opts.agreementNumber)}</span>) for <strong>${escapeHtml(opts.partnerName)}</strong> expires in ${opts.daysUntilExpiry} day${opts.daysUntilExpiry === 1 ? '' : 's'}.</p>
+<p>Review it and reach out if you'd like to renew.</p>
+<p><a href="${escapeHtml(base + '/partner/agreements')}" style="display:inline-block;padding:12px 20px;background:#2563eb;color:#fff;text-decoration:none;border-radius:8px;">View agreement</a></p>`
+    );
+    return send({ to, subject: `Agreement expiring soon — ${opts.agreementTitle}`, html });
+  },
 };

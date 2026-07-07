@@ -19,6 +19,8 @@ type ActivityType =
   | 'onboarding_stage_completed'
   | 'partner_offboarded'
   | 'tier_changed'
+  | 'document_deleted'
+  | 'login'
   | 'other';
 
 export async function logPartnerActivity(input: {

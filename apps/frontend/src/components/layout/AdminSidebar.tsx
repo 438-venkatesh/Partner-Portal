@@ -26,6 +26,7 @@ import {
   DollarSign,
   GraduationCap,
   Megaphone,
+  ShieldCheck,
 } from 'lucide-react';
 import { useAuthStore } from '@/lib/stores/authStore';
 import { useNavigate } from '@tanstack/react-router';
@@ -74,6 +75,7 @@ export function AdminSidebar() {
         { to: '/revenue', label: 'Deals & revenue', icon: DollarSign },
         { to: '/enablement', label: 'Enablement', icon: GraduationCap },
         { to: '/comarketing', label: 'Co-marketing', icon: Megaphone },
+        { to: '/compliance', label: 'Compliance', icon: ShieldCheck },
         { to: '/billing', label: 'Billing', icon: CreditCard },
       ],
     },

@@ -20,6 +20,7 @@ export * from './mdf';
 export * from './training';
 export * from './enablementContent';
 export * from './comarketing';
+export * from './compliance';
 
 // Re-export for convenience
 import { partners, partnerUsers } from './partners';
@@ -78,6 +79,7 @@ import {
 } from './training';
 import { salesPlaybooks, marketingAssets } from './enablementContent';
 import { coMarketingPages, referralLinks } from './comarketing';
+import { agreementReminderLog, dataErasureRequests } from './compliance';
 
 export const schema = {
   partners,
@@ -138,4 +140,6 @@ export const schema = {
   marketingAssets,
   coMarketingPages,
   referralLinks,
+  agreementReminderLog,
+  dataErasureRequests,
 };

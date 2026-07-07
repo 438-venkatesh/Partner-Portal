@@ -49,6 +49,8 @@ import { partnerEnablementPortalRoutes } from './routes/partnerEnablementPortal'
 import { comarketingRoutes } from './routes/comarketing';
 import { partnerComarketingPortalRoutes } from './routes/partnerComarketingPortal';
 import { publicComarketingRoutes } from './routes/publicComarketing';
+import { dataPrivacyRoutes } from './routes/dataPrivacy';
+import { partnerPrivacyPortalRoutes } from './routes/partnerPrivacyPortal';
 import { mockDataService } from './services/mockDataService';
 import { dbPool } from './db';
 
@@ -116,6 +118,8 @@ async function start() {
     await server.register(comarketingRoutes, { prefix: '/api/comarketing' });
     await server.register(partnerComarketingPortalRoutes, { prefix: '/api/partner-comarketing' });
     await server.register(publicComarketingRoutes, { prefix: '/api/co-marketing' });
+    await server.register(dataPrivacyRoutes, { prefix: '/api/privacy' });
+    await server.register(partnerPrivacyPortalRoutes, { prefix: '/api/partner-privacy' });
 
     await server.register(partnerAuthRoutes, { prefix: '/api/partner-auth' });
     server.post('/api/partner-auth/resend-verification', handleResendVerification);

@@ -2,6 +2,13 @@ import { db } from '../db';
 import { partnerDocuments } from '../db/schema/documents';
 import { eq } from 'drizzle-orm';
 import { cloudinaryService } from './cloudinaryService';
+import { logPartnerActivity } from '../utils/activityLogger';
+
+/** Never hand a permanent Cloudinary URL or internal storage key back to an API client. */
+function toClientDocument(document: typeof partnerDocuments.$inferSelect) {
+  const { fileUrl, storageKey, ...safe } = document;
+  return safe;
+}
 
 /** Drizzle `date('col')` defaults to string mode — PG expects YYYY-MM-DD. */
 function toPgDateString(value: Date | string | undefined): string | undefined {
@@ -83,7 +90,16 @@ export const documentService = {
       })
       .returning();
 
-    return document;
+    await logPartnerActivity({
+      partnerId: data.partnerId,
+      activityType: 'document_uploaded',
+      activityDescription: `Document "${data.documentName}" (${data.documentType}) uploaded.`,
+      performedBy: user.userId,
+      performedByType: 'platform_admin',
+      metadata: { documentId: document.documentId, documentType: data.documentType },
+    });
+
+    return toClientDocument(document);
   },
 
   async uploadForPartner(
@@ -121,15 +137,25 @@ export const documentService = {
       })
       .returning();
 
-    return document;
+    await logPartnerActivity({
+      partnerId,
+      activityType: 'document_uploaded',
+      activityDescription: `Document "${data.documentName}" (${data.documentType}) uploaded.`,
+      performedBy: uploadedByAccountId,
+      performedByType: 'partner_user',
+      metadata: { documentId: document.documentId, documentType: data.documentType },
+    });
+
+    return toClientDocument(document);
   },
 
   async getPartnerDocuments(partnerId: string) {
-    return db
+    const rows = await db
       .select()
       .from(partnerDocuments)
       .where(eq(partnerDocuments.partnerId, partnerId))
       .orderBy(partnerDocuments.uploadedAt);
+    return rows.map(toClientDocument);
   },
 
   async getDocumentById(documentId: string) {
@@ -141,32 +167,24 @@ export const documentService = {
     return document ?? null;
   },
 
-  async getDocumentAccessUrlForPartner(
-    documentId: string,
-    partnerId: string,
-    opts: { disposition?: 'inline' | 'attachment' } = {}
-  ): Promise<string> {
+  async getDocumentAccessUrlForPartner(documentId: string, partnerId: string): Promise<string> {
     const document = await this.getDocumentById(documentId);
     if (!document || document.partnerId !== partnerId) {
       throw new Error('Document not found');
     }
-    return this.getDocumentAccessUrl(documentId, opts);
+    return this.getDocumentAccessUrl(documentId);
   },
 
-  async getDocumentAccessUrl(
-    documentId: string,
-    opts: { disposition?: 'inline' | 'attachment' } = {}
-  ): Promise<string> {
+  /** Returns a signed, time-limited download link — never the permanent public Cloudinary URL. */
+  async getDocumentAccessUrl(documentId: string): Promise<string> {
     const document = await this.getDocumentById(documentId);
     if (!document) {
       throw new Error('Document not found');
     }
 
     if (document.storageKey) {
-      return cloudinaryService.getDocumentDeliveryUrl(document.storageKey, {
+      return cloudinaryService.getSignedDownloadUrl(document.storageKey, {
         mimeType: document.mimeType,
-        disposition: opts.disposition ?? 'inline',
-        filename: document.documentName,
         secureUrl: document.fileUrl,
       });
     }
@@ -278,7 +296,10 @@ export const documentService = {
     return this.getDocumentContent(documentId);
   },
 
-  async deleteDocument(documentId: string): Promise<void> {
+  async deleteDocument(
+    documentId: string,
+    actor: { userId: string; type: 'platform_admin' | 'partner_user' }
+  ): Promise<void> {
     const document = await this.getDocumentById(documentId);
     if (!document) {
       throw new Error('Document not found');
@@ -299,14 +320,23 @@ export const documentService = {
     if (deleted.length === 0) {
       throw new Error('Document not found');
     }
+
+    await logPartnerActivity({
+      partnerId: document.partnerId,
+      activityType: 'document_deleted',
+      activityDescription: `Document "${document.documentName}" deleted.`,
+      performedBy: actor.userId,
+      performedByType: actor.type,
+      metadata: { documentId, documentType: document.documentType },
+    });
   },
 
-  async deleteDocumentForPartner(documentId: string, partnerId: string): Promise<void> {
+  async deleteDocumentForPartner(documentId: string, partnerId: string, accountId: string): Promise<void> {
     const document = await this.getDocumentById(documentId);
     if (!document || document.partnerId !== partnerId) {
       throw new Error('Document not found');
     }
-    await this.deleteDocument(documentId);
+    await this.deleteDocument(documentId, { userId: accountId, type: 'partner_user' });
   },
 
   async verifyDocument(
@@ -329,6 +359,15 @@ export const documentService = {
     if (!document) {
       throw new Error('Document not found');
     }
+
+    await logPartnerActivity({
+      partnerId: document.partnerId,
+      activityType: 'document_verified',
+      activityDescription: `Document "${document.documentName}" ${data.verified ? 'approved' : 'rejected'}.`,
+      performedBy: user.userId,
+      performedByType: 'platform_admin',
+      metadata: { documentId, approved: data.verified, notes: data.notes },
+    });
 
     return document;
   },

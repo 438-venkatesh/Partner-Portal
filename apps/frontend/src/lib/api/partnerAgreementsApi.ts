@@ -30,9 +30,10 @@ export const partnerAgreementsApi = {
     return data;
   },
 
-  sign: async (agreementId: string) => {
+  sign: async (agreementId: string, fullName: string) => {
     const { data } = await partnerApiClient.post<{ agreement: PartnerPortalAgreement }>(
-      `/partner-agreements/${agreementId}/sign`
+      `/partner-agreements/${agreementId}/sign`,
+      { fullName }
     );
     return data;
   },

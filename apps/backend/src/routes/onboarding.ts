@@ -11,6 +11,7 @@ import { autoApprovalService } from '../services/autoApprovalService';
 import { db } from '../db';
 import { partnerAgreements } from '../db/schema';
 import { eq } from 'drizzle-orm';
+import { logPartnerActivity } from '../utils/activityLogger';
 import {
   approveStageSchema,
   rejectStageSchema,
@@ -310,6 +311,18 @@ export async function onboardingRoutes(fastify: FastifyInstance) {
       })
       .where(eq(partnerAgreements.agreementId, request.params.agreementId))
       .returning();
+
+    if (updated) {
+      await logPartnerActivity({
+        partnerId: updated.partnerId,
+        activityType: 'agreement_signed',
+        activityDescription: `Agreement "${updated.title}" countersigned by platform staff.`,
+        performedBy: request.user!.userId!,
+        performedByType: 'platform_admin',
+        metadata: { agreementId: updated.agreementId },
+      });
+    }
+
     return reply.send({ agreement: updated });
   });
 

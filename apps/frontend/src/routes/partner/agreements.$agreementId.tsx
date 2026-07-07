@@ -26,7 +26,7 @@ function PartnerAgreementDetailPage() {
   });
 
   const signMutation = useMutation({
-    mutationFn: () => partnerAgreementsApi.sign(agreementId),
+    mutationFn: (fullName: string) => partnerAgreementsApi.sign(agreementId, fullName),
     onSuccess: () => {
       setSignDialogOpen(false);
       toast({ title: 'Signed', description: 'Agreement status has been updated.' });
@@ -158,7 +158,7 @@ function PartnerAgreementDetailPage() {
           agreementTitle={a.title}
           agreementNumber={a.agreementNumber}
           isPending={signMutation.isPending}
-          onConfirm={() => signMutation.mutate()}
+          onConfirm={(fullName) => signMutation.mutate(fullName)}
         />
       )}
     </div>

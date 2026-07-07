@@ -1,10 +1,10 @@
 import { FastifyInstance } from 'fastify';
-import { authenticatePartner } from '../middleware/partnerAuth';
 import { authenticate } from '../middleware/auth';
 
 /**
- * Placeholders for external integrations (Stripe/Razorpay, DocuSign, logistics carriers).
- * Replace with real provider SDK calls and secrets from environment variables.
+ * Placeholders for external integrations (Stripe/Razorpay, logistics carriers) that need a real
+ * payment/carrier account to wire up for real. Partner agreement e-signing is NOT a stub here —
+ * see agreementService.signByPartner for the native typed-signature capture that replaced it.
  */
 export async function integrationStubRoutes(fastify: FastifyInstance) {
   fastify.post(
@@ -30,19 +30,6 @@ export async function integrationStubRoutes(fastify: FastifyInstance) {
         status: 'in_transit',
         events: [],
         message: 'Wire logisticsPartners.trackingApiUrl fetch here',
-      });
-    }
-  );
-
-  fastify.post(
-    '/partner-agreements/:agreementId/esign/start',
-    { preHandler: [authenticatePartner] },
-    async (request, reply) => {
-      const { agreementId } = request.params as { agreementId: string };
-      return reply.send({
-        agreementId,
-        signingUrl: `https://esign.example.com/sign/${agreementId}`,
-        message: 'Wire DocuSign / HelloSign using eSignatureDocumentId',
       });
     }
   );
