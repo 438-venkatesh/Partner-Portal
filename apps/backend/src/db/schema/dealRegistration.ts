@@ -38,6 +38,9 @@ export const leads = pgTable('leads', {
   /** new | assigned | accepted | rejected | converted | expired */
   status: varchar('status', { length: 20 }).notNull().default('new'),
   routingRuleId: uuid('routing_rule_id'),
+  /** Set when `source` is 'referral' or 'co_marketing_page' — which link/page attributed this lead. */
+  referralLinkId: uuid('referral_link_id'),
+  coMarketingPageId: uuid('co_marketing_page_id'),
   notes: text('notes'),
   createdAt: timestamp('created_at').defaultNow(),
   assignedAt: timestamp('assigned_at'),

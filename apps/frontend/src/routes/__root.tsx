@@ -16,15 +16,21 @@ function isPublicDirectoryPath(pathname: string): boolean {
   return pathname === '/directory' || pathname.startsWith('/directory/');
 }
 
+/** Public co-marketing microsites — a prospect landing on a partner's co-branded page needs no login. */
+function isPublicCoMarketingPath(pathname: string): boolean {
+  return pathname === '/co' || pathname.startsWith('/co/');
+}
+
 export const Route = createRootRoute({
   component: RootComponent,
   beforeLoad: ({ location }) => {
     const pathname = location.pathname;
 
-    // Operations Portal: require platform JWT (auth_token), except /login and the public directory
+    // Operations Portal: require platform JWT (auth_token), except /login, the public directory, and co-marketing pages
     if (
       !isPartnerSelfServicePath(pathname) &&
       !isPublicDirectoryPath(pathname) &&
+      !isPublicCoMarketingPath(pathname) &&
       pathname !== '/login'
     ) {
       const platformToken = localStorage.getItem('auth_token');
@@ -109,8 +115,8 @@ function RootComponent() {
     );
   }
   
-  // Operations Portal login / public directory — full-screen only (no admin chrome)
-  if (pathname === '/login' || isPublicDirectoryPath(pathname)) {
+  // Operations Portal login / public directory / co-marketing pages — full-screen only (no admin chrome)
+  if (pathname === '/login' || isPublicDirectoryPath(pathname) || isPublicCoMarketingPath(pathname)) {
     return (
       <ErrorBoundary>
         <Outlet />

@@ -133,6 +133,7 @@ export const leadService = {
         assignedPartnerId: leads.assignedPartnerId,
         partnerName: partners.partnerName,
         status: leads.status,
+        source: leads.source,
         createdAt: leads.createdAt,
       })
       .from(leads)

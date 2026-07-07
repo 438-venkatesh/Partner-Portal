@@ -106,6 +106,7 @@ export interface MarketingAsset {
   minTier: string | null;
   tags: string[];
   downloadCount: number;
+  allowCoBranding: boolean;
   isActive: boolean;
 }
 

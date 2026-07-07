@@ -12,5 +12,6 @@ export * from './schemas/mdf';
 export * from './schemas/serviceCatalog';
 export * from './schemas/training';
 export * from './schemas/enablement';
+export * from './schemas/comarketing';
 export * from './partnerOnboardingByType';
 

@@ -27,6 +27,8 @@ export const marketingAssets = pgTable('marketing_assets', {
   minTier: varchar('min_tier', { length: 50 }),
   tags: jsonb('tags').default([]),
   downloadCount: integer('download_count').default(0),
+  /** Whether a partner may generate a co-branded microsite from this asset. */
+  allowCoBranding: boolean('allow_co_branding').default(false),
   isActive: boolean('is_active').default(true),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),

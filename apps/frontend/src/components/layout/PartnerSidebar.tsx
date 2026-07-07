@@ -22,6 +22,7 @@ import {
   Package,
   Truck,
   GraduationCap,
+  Megaphone,
 } from 'lucide-react';
 import { usePartnerAuthStore } from '@/lib/stores/partnerAuthStore';
 import { partnerDashboardApi } from '@/lib/api/partnerDashboard';
@@ -120,6 +121,7 @@ export function PartnerSidebar() {
         { to: '/partner/dashboard', label: 'Dashboard', icon: LayoutDashboard },
         { to: '/partner/revenue', label: 'Deals & revenue', icon: DollarSign },
         { to: '/partner/enablement', label: 'Enablement', icon: GraduationCap },
+        { to: '/partner/comarketing', label: 'Co-marketing', icon: Megaphone },
       ],
     },
     ...(showClientManagement

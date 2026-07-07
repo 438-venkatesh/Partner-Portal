@@ -7,3 +7,13 @@ export const routeRateLimitLogin = {
     },
   },
 };
+
+/** Looser limit for public, unauthenticated form submissions (lead capture, etc.) — deters spam, not real users. */
+export const routeRateLimitPublicSubmit = {
+  config: {
+    rateLimit: {
+      max: 10,
+      timeWindow: '1 minute' as const,
+    },
+  },
+};

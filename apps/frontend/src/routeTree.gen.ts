@@ -22,6 +22,7 @@ import { Route as PartnerOperationsIndexRouteImport } from './routes/partner-ope
 import { Route as LogisticsIndexRouteImport } from './routes/logistics/index'
 import { Route as EnablementIndexRouteImport } from './routes/enablement/index'
 import { Route as DirectoryIndexRouteImport } from './routes/directory/index'
+import { Route as ComarketingIndexRouteImport } from './routes/comarketing/index'
 import { Route as BillingIndexRouteImport } from './routes/billing/index'
 import { Route as AccountMappingIndexRouteImport } from './routes/account-mapping/index'
 import { Route as TenantsNewRouteImport } from './routes/tenants/new'
@@ -47,10 +48,12 @@ import { Route as PartnerEnablementRouteImport } from './routes/partner/enableme
 import { Route as PartnerEmployeesRouteImport } from './routes/partner/employees'
 import { Route as PartnerDocumentsRouteImport } from './routes/partner/documents'
 import { Route as PartnerDashboardRouteImport } from './routes/partner/dashboard'
+import { Route as PartnerComarketingRouteImport } from './routes/partner/comarketing'
 import { Route as PartnerAgreementsRouteImport } from './routes/partner/agreements'
 import { Route as OnboardingSettingsRouteImport } from './routes/onboarding/settings'
 import { Route as OnboardingAnalyticsRouteImport } from './routes/onboarding/analytics'
 import { Route as LogisticsShipmentsRouteImport } from './routes/logistics/shipments'
+import { Route as CoSlugRouteImport } from './routes/co.$slug'
 import { Route as PartnersPartnerIdIndexRouteImport } from './routes/partners/$partnerId/index'
 import { Route as PartnerTenantsIndexRouteImport } from './routes/partner/tenants/index'
 import { Route as SuppliersPurchaseOrdersPoIdRouteImport } from './routes/suppliers/purchase-orders/$poId'
@@ -129,6 +132,11 @@ const EnablementIndexRoute = EnablementIndexRouteImport.update({
 const DirectoryIndexRoute = DirectoryIndexRouteImport.update({
   id: '/directory/',
   path: '/directory/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComarketingIndexRoute = ComarketingIndexRouteImport.update({
+  id: '/comarketing/',
+  path: '/comarketing/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BillingIndexRoute = BillingIndexRouteImport.update({
@@ -257,6 +265,11 @@ const PartnerDashboardRoute = PartnerDashboardRouteImport.update({
   path: '/partner/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PartnerComarketingRoute = PartnerComarketingRouteImport.update({
+  id: '/partner/comarketing',
+  path: '/partner/comarketing',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PartnerAgreementsRoute = PartnerAgreementsRouteImport.update({
   id: '/partner/agreements',
   path: '/partner/agreements',
@@ -275,6 +288,11 @@ const OnboardingAnalyticsRoute = OnboardingAnalyticsRouteImport.update({
 const LogisticsShipmentsRoute = LogisticsShipmentsRouteImport.update({
   id: '/logistics/shipments',
   path: '/logistics/shipments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CoSlugRoute = CoSlugRouteImport.update({
+  id: '/co/$slug',
+  path: '/co/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PartnersPartnerIdIndexRoute = PartnersPartnerIdIndexRouteImport.update({
@@ -366,11 +384,13 @@ const PartnerOnboardingServiceStageRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/co/$slug': typeof CoSlugRoute
   '/logistics/shipments': typeof LogisticsShipmentsRouteWithChildren
   '/onboarding/analytics': typeof OnboardingAnalyticsRoute
   '/onboarding/settings': typeof OnboardingSettingsRoute
   '/partner': typeof Partner_rootRoute
   '/partner/agreements': typeof PartnerAgreementsRouteWithChildren
+  '/partner/comarketing': typeof PartnerComarketingRoute
   '/partner/dashboard': typeof PartnerDashboardRoute
   '/partner/documents': typeof PartnerDocumentsRoute
   '/partner/employees': typeof PartnerEmployeesRoute
@@ -396,6 +416,7 @@ export interface FileRoutesByFullPath {
   '/tenants/new': typeof TenantsNewRoute
   '/account-mapping': typeof AccountMappingIndexRoute
   '/billing': typeof BillingIndexRoute
+  '/comarketing': typeof ComarketingIndexRoute
   '/directory': typeof DirectoryIndexRoute
   '/enablement': typeof EnablementIndexRoute
   '/logistics': typeof LogisticsIndexRoute
@@ -425,11 +446,13 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/co/$slug': typeof CoSlugRoute
   '/logistics/shipments': typeof LogisticsShipmentsRouteWithChildren
   '/onboarding/analytics': typeof OnboardingAnalyticsRoute
   '/onboarding/settings': typeof OnboardingSettingsRoute
   '/partner': typeof Partner_rootRoute
   '/partner/agreements': typeof PartnerAgreementsRouteWithChildren
+  '/partner/comarketing': typeof PartnerComarketingRoute
   '/partner/dashboard': typeof PartnerDashboardRoute
   '/partner/documents': typeof PartnerDocumentsRoute
   '/partner/employees': typeof PartnerEmployeesRoute
@@ -454,6 +477,7 @@ export interface FileRoutesByTo {
   '/tenants/new': typeof TenantsNewRoute
   '/account-mapping': typeof AccountMappingIndexRoute
   '/billing': typeof BillingIndexRoute
+  '/comarketing': typeof ComarketingIndexRoute
   '/directory': typeof DirectoryIndexRoute
   '/enablement': typeof EnablementIndexRoute
   '/logistics': typeof LogisticsIndexRoute
@@ -484,11 +508,13 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/co/$slug': typeof CoSlugRoute
   '/logistics/shipments': typeof LogisticsShipmentsRouteWithChildren
   '/onboarding/analytics': typeof OnboardingAnalyticsRoute
   '/onboarding/settings': typeof OnboardingSettingsRoute
   '/partner/__root': typeof Partner_rootRoute
   '/partner/agreements': typeof PartnerAgreementsRouteWithChildren
+  '/partner/comarketing': typeof PartnerComarketingRoute
   '/partner/dashboard': typeof PartnerDashboardRoute
   '/partner/documents': typeof PartnerDocumentsRoute
   '/partner/employees': typeof PartnerEmployeesRoute
@@ -514,6 +540,7 @@ export interface FileRoutesById {
   '/tenants/new': typeof TenantsNewRoute
   '/account-mapping/': typeof AccountMappingIndexRoute
   '/billing/': typeof BillingIndexRoute
+  '/comarketing/': typeof ComarketingIndexRoute
   '/directory/': typeof DirectoryIndexRoute
   '/enablement/': typeof EnablementIndexRoute
   '/logistics/': typeof LogisticsIndexRoute
@@ -545,11 +572,13 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
+    | '/co/$slug'
     | '/logistics/shipments'
     | '/onboarding/analytics'
     | '/onboarding/settings'
     | '/partner'
     | '/partner/agreements'
+    | '/partner/comarketing'
     | '/partner/dashboard'
     | '/partner/documents'
     | '/partner/employees'
@@ -575,6 +604,7 @@ export interface FileRouteTypes {
     | '/tenants/new'
     | '/account-mapping'
     | '/billing'
+    | '/comarketing'
     | '/directory'
     | '/enablement'
     | '/logistics'
@@ -604,11 +634,13 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/login'
+    | '/co/$slug'
     | '/logistics/shipments'
     | '/onboarding/analytics'
     | '/onboarding/settings'
     | '/partner'
     | '/partner/agreements'
+    | '/partner/comarketing'
     | '/partner/dashboard'
     | '/partner/documents'
     | '/partner/employees'
@@ -633,6 +665,7 @@ export interface FileRouteTypes {
     | '/tenants/new'
     | '/account-mapping'
     | '/billing'
+    | '/comarketing'
     | '/directory'
     | '/enablement'
     | '/logistics'
@@ -662,11 +695,13 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/login'
+    | '/co/$slug'
     | '/logistics/shipments'
     | '/onboarding/analytics'
     | '/onboarding/settings'
     | '/partner/__root'
     | '/partner/agreements'
+    | '/partner/comarketing'
     | '/partner/dashboard'
     | '/partner/documents'
     | '/partner/employees'
@@ -692,6 +727,7 @@ export interface FileRouteTypes {
     | '/tenants/new'
     | '/account-mapping/'
     | '/billing/'
+    | '/comarketing/'
     | '/directory/'
     | '/enablement/'
     | '/logistics/'
@@ -722,11 +758,13 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LoginRoute: typeof LoginRoute
+  CoSlugRoute: typeof CoSlugRoute
   LogisticsShipmentsRoute: typeof LogisticsShipmentsRouteWithChildren
   OnboardingAnalyticsRoute: typeof OnboardingAnalyticsRoute
   OnboardingSettingsRoute: typeof OnboardingSettingsRoute
   Partner_rootRoute: typeof Partner_rootRoute
   PartnerAgreementsRoute: typeof PartnerAgreementsRouteWithChildren
+  PartnerComarketingRoute: typeof PartnerComarketingRoute
   PartnerDashboardRoute: typeof PartnerDashboardRoute
   PartnerDocumentsRoute: typeof PartnerDocumentsRoute
   PartnerEmployeesRoute: typeof PartnerEmployeesRoute
@@ -752,6 +790,7 @@ export interface RootRouteChildren {
   TenantsNewRoute: typeof TenantsNewRoute
   AccountMappingIndexRoute: typeof AccountMappingIndexRoute
   BillingIndexRoute: typeof BillingIndexRoute
+  ComarketingIndexRoute: typeof ComarketingIndexRoute
   DirectoryIndexRoute: typeof DirectoryIndexRoute
   EnablementIndexRoute: typeof EnablementIndexRoute
   LogisticsIndexRoute: typeof LogisticsIndexRoute
@@ -858,6 +897,13 @@ declare module '@tanstack/react-router' {
       path: '/directory'
       fullPath: '/directory'
       preLoaderRoute: typeof DirectoryIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/comarketing/': {
+      id: '/comarketing/'
+      path: '/comarketing'
+      fullPath: '/comarketing'
+      preLoaderRoute: typeof ComarketingIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/billing/': {
@@ -1035,6 +1081,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PartnerDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/partner/comarketing': {
+      id: '/partner/comarketing'
+      path: '/partner/comarketing'
+      fullPath: '/partner/comarketing'
+      preLoaderRoute: typeof PartnerComarketingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/partner/agreements': {
       id: '/partner/agreements'
       path: '/partner/agreements'
@@ -1061,6 +1114,13 @@ declare module '@tanstack/react-router' {
       path: '/logistics/shipments'
       fullPath: '/logistics/shipments'
       preLoaderRoute: typeof LogisticsShipmentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/co/$slug': {
+      id: '/co/$slug'
+      path: '/co/$slug'
+      fullPath: '/co/$slug'
+      preLoaderRoute: typeof CoSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/partners/$partnerId/': {
@@ -1265,11 +1325,13 @@ const SuppliersPurchaseOrdersRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRoute: LoginRoute,
+  CoSlugRoute: CoSlugRoute,
   LogisticsShipmentsRoute: LogisticsShipmentsRouteWithChildren,
   OnboardingAnalyticsRoute: OnboardingAnalyticsRoute,
   OnboardingSettingsRoute: OnboardingSettingsRoute,
   Partner_rootRoute: Partner_rootRoute,
   PartnerAgreementsRoute: PartnerAgreementsRouteWithChildren,
+  PartnerComarketingRoute: PartnerComarketingRoute,
   PartnerDashboardRoute: PartnerDashboardRoute,
   PartnerDocumentsRoute: PartnerDocumentsRoute,
   PartnerEmployeesRoute: PartnerEmployeesRoute,
@@ -1295,6 +1357,7 @@ const rootRouteChildren: RootRouteChildren = {
   TenantsNewRoute: TenantsNewRoute,
   AccountMappingIndexRoute: AccountMappingIndexRoute,
   BillingIndexRoute: BillingIndexRoute,
+  ComarketingIndexRoute: ComarketingIndexRoute,
   DirectoryIndexRoute: DirectoryIndexRoute,
   EnablementIndexRoute: EnablementIndexRoute,
   LogisticsIndexRoute: LogisticsIndexRoute,

@@ -7,8 +7,10 @@ import { Button } from '@/components/ui/button';
 import { FormInput } from '@/components/ui/form-field';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/lib/hooks/use-toast';
 import { Download, Plus, Trash2 } from 'lucide-react';
+import type { MarketingAsset } from '@/lib/api/enablement';
 
 export function AssetsAdminPage() {
   const { toast } = useToast();
@@ -38,6 +40,11 @@ export function AssetsAdminPage() {
       toast({ title: 'Asset deleted' });
       queryClient.invalidateQueries({ queryKey: ['marketing-assets'] });
     },
+  });
+
+  const toggleCoBrandingMutation = useMutation({
+    mutationFn: (asset: MarketingAsset) => enablementApi.updateAsset(asset.assetId, { allowCoBranding: !asset.allowCoBranding }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['marketing-assets'] }),
   });
 
   return (
@@ -84,7 +91,14 @@ export function AssetsAdminPage() {
                   ))}
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
+                <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <Switch
+                    checked={asset.allowCoBranding}
+                    onCheckedChange={() => toggleCoBrandingMutation.mutate(asset)}
+                  />
+                  Co-brandable
+                </label>
                 <a href={asset.fileUrl} target="_blank" rel="noreferrer">
                   <Button variant="outline" size="sm">
                     <Download className="h-4 w-4" />

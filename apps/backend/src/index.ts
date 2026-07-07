@@ -46,6 +46,9 @@ import { trainingRoutes } from './routes/training';
 import { partnerTrainingPortalRoutes } from './routes/partnerTrainingPortal';
 import { enablementContentRoutes } from './routes/enablementContent';
 import { partnerEnablementPortalRoutes } from './routes/partnerEnablementPortal';
+import { comarketingRoutes } from './routes/comarketing';
+import { partnerComarketingPortalRoutes } from './routes/partnerComarketingPortal';
+import { publicComarketingRoutes } from './routes/publicComarketing';
 import { mockDataService } from './services/mockDataService';
 import { dbPool } from './db';
 
@@ -110,6 +113,9 @@ async function start() {
     await server.register(partnerTrainingPortalRoutes, { prefix: '/api/partner-training' });
     await server.register(enablementContentRoutes, { prefix: '/api/enablement' });
     await server.register(partnerEnablementPortalRoutes, { prefix: '/api/partner-enablement' });
+    await server.register(comarketingRoutes, { prefix: '/api/comarketing' });
+    await server.register(partnerComarketingPortalRoutes, { prefix: '/api/partner-comarketing' });
+    await server.register(publicComarketingRoutes, { prefix: '/api/co-marketing' });
 
     await server.register(partnerAuthRoutes, { prefix: '/api/partner-auth' });
     server.post('/api/partner-auth/resend-verification', handleResendVerification);

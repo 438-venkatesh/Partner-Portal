@@ -18,6 +18,7 @@ export const createAssetSchema = z.object({
   partnerType: z.string().max(50).optional(),
   minTier: z.string().max(50).optional(),
   tags: z.array(z.string()).optional(),
+  allowCoBranding: z.boolean().optional(),
 });
 
 export const updateAssetSchema = createAssetSchema.partial();

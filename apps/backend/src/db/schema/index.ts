@@ -19,6 +19,7 @@ export * from './commissions';
 export * from './mdf';
 export * from './training';
 export * from './enablementContent';
+export * from './comarketing';
 
 // Re-export for convenience
 import { partners, partnerUsers } from './partners';
@@ -76,6 +77,7 @@ import {
   learningPaths,
 } from './training';
 import { salesPlaybooks, marketingAssets } from './enablementContent';
+import { coMarketingPages, referralLinks } from './comarketing';
 
 export const schema = {
   partners,
@@ -134,4 +136,6 @@ export const schema = {
   learningPaths,
   salesPlaybooks,
   marketingAssets,
+  coMarketingPages,
+  referralLinks,
 };
