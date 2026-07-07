@@ -23,6 +23,7 @@ import {
   Award,
   Layers,
   Share2,
+  DollarSign,
 } from 'lucide-react';
 import { useAuthStore } from '@/lib/stores/authStore';
 import { useNavigate } from '@tanstack/react-router';
@@ -68,6 +69,7 @@ export function AdminSidebar() {
       title: 'Main',
       items: [
         { to: '/partners', label: 'Dashboard', icon: LayoutDashboard },
+        { to: '/revenue', label: 'Deals & revenue', icon: DollarSign },
         { to: '/billing', label: 'Billing', icon: CreditCard },
       ],
     },

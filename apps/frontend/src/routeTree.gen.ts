@@ -14,6 +14,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TenantsIndexRouteImport } from './routes/tenants/index'
 import { Route as SuppliersIndexRouteImport } from './routes/suppliers/index'
+import { Route as RevenueIndexRouteImport } from './routes/revenue/index'
 import { Route as PartnersIndexRouteImport } from './routes/partners/index'
 import { Route as PartnerTiersIndexRouteImport } from './routes/partner-tiers/index'
 import { Route as PartnerSegmentsIndexRouteImport } from './routes/partner-segments/index'
@@ -35,6 +36,7 @@ import { Route as PartnerVerifyEmailRouteImport } from './routes/partner/verify-
 import { Route as PartnerTimelinesRouteImport } from './routes/partner/timelines'
 import { Route as PartnerSettingsRouteImport } from './routes/partner/settings'
 import { Route as PartnerServicesRouteImport } from './routes/partner/services'
+import { Route as PartnerRevenueRouteImport } from './routes/partner/revenue'
 import { Route as PartnerResendVerificationRouteImport } from './routes/partner/resend-verification'
 import { Route as PartnerRegisterRouteImport } from './routes/partner/register'
 import { Route as PartnerOnboardingRouteImport } from './routes/partner/onboarding'
@@ -85,6 +87,11 @@ const TenantsIndexRoute = TenantsIndexRouteImport.update({
 const SuppliersIndexRoute = SuppliersIndexRouteImport.update({
   id: '/suppliers/',
   path: '/suppliers/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RevenueIndexRoute = RevenueIndexRouteImport.update({
+  id: '/revenue/',
+  path: '/revenue/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PartnersIndexRoute = PartnersIndexRouteImport.update({
@@ -190,6 +197,11 @@ const PartnerSettingsRoute = PartnerSettingsRouteImport.update({
 const PartnerServicesRoute = PartnerServicesRouteImport.update({
   id: '/partner/services',
   path: '/partner/services',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PartnerRevenueRoute = PartnerRevenueRouteImport.update({
+  id: '/partner/revenue',
+  path: '/partner/revenue',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PartnerResendVerificationRoute =
@@ -355,6 +367,7 @@ export interface FileRoutesByFullPath {
   '/partner/onboarding': typeof PartnerOnboardingRouteWithChildren
   '/partner/register': typeof PartnerRegisterRoute
   '/partner/resend-verification': typeof PartnerResendVerificationRoute
+  '/partner/revenue': typeof PartnerRevenueRoute
   '/partner/services': typeof PartnerServicesRoute
   '/partner/settings': typeof PartnerSettingsRoute
   '/partner/timelines': typeof PartnerTimelinesRouteWithChildren
@@ -376,6 +389,7 @@ export interface FileRoutesByFullPath {
   '/partner-segments': typeof PartnerSegmentsIndexRoute
   '/partner-tiers': typeof PartnerTiersIndexRoute
   '/partners': typeof PartnersIndexRoute
+  '/revenue': typeof RevenueIndexRoute
   '/suppliers': typeof SuppliersIndexRoute
   '/tenants': typeof TenantsIndexRoute
   '/logistics/shipments/$shipmentId': typeof LogisticsShipmentsShipmentIdRoute
@@ -410,6 +424,7 @@ export interface FileRoutesByTo {
   '/partner/onboarding': typeof PartnerOnboardingRouteWithChildren
   '/partner/register': typeof PartnerRegisterRoute
   '/partner/resend-verification': typeof PartnerResendVerificationRoute
+  '/partner/revenue': typeof PartnerRevenueRoute
   '/partner/services': typeof PartnerServicesRoute
   '/partner/settings': typeof PartnerSettingsRoute
   '/partner/timelines': typeof PartnerTimelinesRouteWithChildren
@@ -430,6 +445,7 @@ export interface FileRoutesByTo {
   '/partner-segments': typeof PartnerSegmentsIndexRoute
   '/partner-tiers': typeof PartnerTiersIndexRoute
   '/partners': typeof PartnersIndexRoute
+  '/revenue': typeof RevenueIndexRoute
   '/suppliers': typeof SuppliersIndexRoute
   '/tenants': typeof TenantsIndexRoute
   '/logistics/shipments/$shipmentId': typeof LogisticsShipmentsShipmentIdRoute
@@ -465,6 +481,7 @@ export interface FileRoutesById {
   '/partner/onboarding': typeof PartnerOnboardingRouteWithChildren
   '/partner/register': typeof PartnerRegisterRoute
   '/partner/resend-verification': typeof PartnerResendVerificationRoute
+  '/partner/revenue': typeof PartnerRevenueRoute
   '/partner/services': typeof PartnerServicesRoute
   '/partner/settings': typeof PartnerSettingsRoute
   '/partner/timelines': typeof PartnerTimelinesRouteWithChildren
@@ -486,6 +503,7 @@ export interface FileRoutesById {
   '/partner-segments/': typeof PartnerSegmentsIndexRoute
   '/partner-tiers/': typeof PartnerTiersIndexRoute
   '/partners/': typeof PartnersIndexRoute
+  '/revenue/': typeof RevenueIndexRoute
   '/suppliers/': typeof SuppliersIndexRoute
   '/tenants/': typeof TenantsIndexRoute
   '/logistics/shipments/$shipmentId': typeof LogisticsShipmentsShipmentIdRoute
@@ -522,6 +540,7 @@ export interface FileRouteTypes {
     | '/partner/onboarding'
     | '/partner/register'
     | '/partner/resend-verification'
+    | '/partner/revenue'
     | '/partner/services'
     | '/partner/settings'
     | '/partner/timelines'
@@ -543,6 +562,7 @@ export interface FileRouteTypes {
     | '/partner-segments'
     | '/partner-tiers'
     | '/partners'
+    | '/revenue'
     | '/suppliers'
     | '/tenants'
     | '/logistics/shipments/$shipmentId'
@@ -577,6 +597,7 @@ export interface FileRouteTypes {
     | '/partner/onboarding'
     | '/partner/register'
     | '/partner/resend-verification'
+    | '/partner/revenue'
     | '/partner/services'
     | '/partner/settings'
     | '/partner/timelines'
@@ -597,6 +618,7 @@ export interface FileRouteTypes {
     | '/partner-segments'
     | '/partner-tiers'
     | '/partners'
+    | '/revenue'
     | '/suppliers'
     | '/tenants'
     | '/logistics/shipments/$shipmentId'
@@ -631,6 +653,7 @@ export interface FileRouteTypes {
     | '/partner/onboarding'
     | '/partner/register'
     | '/partner/resend-verification'
+    | '/partner/revenue'
     | '/partner/services'
     | '/partner/settings'
     | '/partner/timelines'
@@ -652,6 +675,7 @@ export interface FileRouteTypes {
     | '/partner-segments/'
     | '/partner-tiers/'
     | '/partners/'
+    | '/revenue/'
     | '/suppliers/'
     | '/tenants/'
     | '/logistics/shipments/$shipmentId'
@@ -687,6 +711,7 @@ export interface RootRouteChildren {
   PartnerOnboardingRoute: typeof PartnerOnboardingRouteWithChildren
   PartnerRegisterRoute: typeof PartnerRegisterRoute
   PartnerResendVerificationRoute: typeof PartnerResendVerificationRoute
+  PartnerRevenueRoute: typeof PartnerRevenueRoute
   PartnerServicesRoute: typeof PartnerServicesRoute
   PartnerSettingsRoute: typeof PartnerSettingsRoute
   PartnerTimelinesRoute: typeof PartnerTimelinesRouteWithChildren
@@ -708,6 +733,7 @@ export interface RootRouteChildren {
   PartnerSegmentsIndexRoute: typeof PartnerSegmentsIndexRoute
   PartnerTiersIndexRoute: typeof PartnerTiersIndexRoute
   PartnersIndexRoute: typeof PartnersIndexRoute
+  RevenueIndexRoute: typeof RevenueIndexRoute
   SuppliersIndexRoute: typeof SuppliersIndexRoute
   TenantsIndexRoute: typeof TenantsIndexRoute
   PartnerResetPasswordTokenRoute: typeof PartnerResetPasswordTokenRoute
@@ -750,6 +776,13 @@ declare module '@tanstack/react-router' {
       path: '/suppliers'
       fullPath: '/suppliers'
       preLoaderRoute: typeof SuppliersIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/revenue/': {
+      id: '/revenue/'
+      path: '/revenue'
+      fullPath: '/revenue'
+      preLoaderRoute: typeof RevenueIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/partners/': {
@@ -897,6 +930,13 @@ declare module '@tanstack/react-router' {
       path: '/partner/services'
       fullPath: '/partner/services'
       preLoaderRoute: typeof PartnerServicesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/partner/revenue': {
+      id: '/partner/revenue'
+      path: '/partner/revenue'
+      fullPath: '/partner/revenue'
+      preLoaderRoute: typeof PartnerRevenueRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/partner/resend-verification': {
@@ -1198,6 +1238,7 @@ const rootRouteChildren: RootRouteChildren = {
   PartnerOnboardingRoute: PartnerOnboardingRouteWithChildren,
   PartnerRegisterRoute: PartnerRegisterRoute,
   PartnerResendVerificationRoute: PartnerResendVerificationRoute,
+  PartnerRevenueRoute: PartnerRevenueRoute,
   PartnerServicesRoute: PartnerServicesRoute,
   PartnerSettingsRoute: PartnerSettingsRoute,
   PartnerTimelinesRoute: PartnerTimelinesRouteWithChildren,
@@ -1219,6 +1260,7 @@ const rootRouteChildren: RootRouteChildren = {
   PartnerSegmentsIndexRoute: PartnerSegmentsIndexRoute,
   PartnerTiersIndexRoute: PartnerTiersIndexRoute,
   PartnersIndexRoute: PartnersIndexRoute,
+  RevenueIndexRoute: RevenueIndexRoute,
   SuppliersIndexRoute: SuppliersIndexRoute,
   TenantsIndexRoute: TenantsIndexRoute,
   PartnerResetPasswordTokenRoute: PartnerResetPasswordTokenRoute,

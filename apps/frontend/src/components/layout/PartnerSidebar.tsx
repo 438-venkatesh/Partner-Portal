@@ -12,6 +12,7 @@ import {
   ChevronRight,
   ChevronDown,
   LayoutDashboard,
+  DollarSign,
   UserCircle,
   LogOut,
   Bell,
@@ -114,7 +115,10 @@ export function PartnerSidebar() {
   const navSections: NavSection[] = [
     {
       title: 'Overview',
-      items: [{ to: '/partner/dashboard', label: 'Dashboard', icon: LayoutDashboard }],
+      items: [
+        { to: '/partner/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+        { to: '/partner/revenue', label: 'Deals & revenue', icon: DollarSign },
+      ],
     },
     ...(showClientManagement
       ? [

@@ -14,6 +14,9 @@ export * from './tenants';
 export * from './commercial';
 export * from './onboardingConfig';
 export * from './partnerRelationship';
+export * from './dealRegistration';
+export * from './commissions';
+export * from './mdf';
 
 // Re-export for convenience
 import { partners, partnerUsers } from './partners';
@@ -55,6 +58,14 @@ import {
   partnerBusinessPlans,
   partnerRewardTransactions,
 } from './partnerRelationship';
+import { deals, leads, leadRoutingRules } from './dealRegistration';
+import {
+  commissionPlans,
+  commissionRecords,
+  incentiveChallenges,
+  challengeCompletions,
+} from './commissions';
+import { mdfFunds, mdfRequests } from './mdf';
 
 export const schema = {
   partners,
@@ -97,4 +108,13 @@ export const schema = {
   partnerSegments,
   partnerBusinessPlans,
   partnerRewardTransactions,
+  deals,
+  leads,
+  leadRoutingRules,
+  commissionPlans,
+  commissionRecords,
+  incentiveChallenges,
+  challengeCompletions,
+  mdfFunds,
+  mdfRequests,
 };
