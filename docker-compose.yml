@@ -1,0 +1,28 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: partner
+      POSTGRES_PASSWORD: partner
+      POSTGRES_DB: partner_portal
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    environment:
+      DATABASE_URL: postgresql://partner:partner@db:5432/partner_portal
+      JWT_SECRET: change-me-in-compose
+      FRONTEND_URL: http://localhost:5173
+      NODE_ENV: development
+    ports:
+      - '3000:3000'
+    depends_on:
+      - db
+
+volumes:
+  pgdata:

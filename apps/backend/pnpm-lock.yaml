@@ -1,0 +1,121 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .:
+    dependencies:
+      '@partner-portal/common':
+        specifier: workspace:*
+        version: link:../../packages/common
+      '@types/bcryptjs':
+        specifier: ^3.0.0
+        version: 3.0.0
+      bcryptjs:
+        specifier: ^3.0.3
+        version: 3.0.3
+
+  ../..: {}
+
+  ../../../Affiliate-Connect-main: {}
+
+  ../../../Affiliate-Connect-main/mobile: {}
+
+  ../../../B2B-CRM-main: {}
+
+  ../../../B2B-CRM-main/server: {}
+
+  ../../../ESOP System: {}
+
+  ../../../ESOP System/apps/backend: {}
+
+  ../../../ESOP System/apps/frontend: {}
+
+  ../../../ESOP System/packages/common: {}
+
+  ../../../Financial-Accounting-master: {}
+
+  ../../../Financial-Accounting-master/Financial-Accounting-master: {}
+
+  ../../../Financial-Accounting-master/Financial-Accounting-master/server: {}
+
+  ../../../Financial-Accounting-master/Financial-Accounting-master/shared-schemas: {}
+
+  ../../../HRMS V1.2/HRMS V1.2/project: {}
+
+  ../../../HRMS V1.2/HRMS V1.2/project/server: {}
+
+  ../../../HRMS V1.2/project: {}
+
+  ../../../HRMS V1.2/project/server: {}
+
+  ../../../Operations-Management-main latest/Operations Mngt/project: {}
+
+  ../../../Operations-Management-main latest/Operations Mngt/project/Inventory_Management: {}
+
+  ../../../Operations-Management-main latest/Operations Mngt/project/unified-order-hub-mobile: {}
+
+  ../../../Operations-Management-main latest/Operations Mngt/project/warehouse-management: {}
+
+  ../../../Project-Management-master: {}
+
+  ../../../Project-Management-master/backend: {}
+
+  ../../../Project-Management-master/mobile: {}
+
+  ../../../Wrapper-main/backend: {}
+
+  ../../../Wrapper-main/frontend: {}
+
+  ../../../Zopkit-Academy-main/Currentproject: {}
+
+  ../../../Zopkit-Academy-main/Currentproject/server: {}
+
+  ../../../Zopkit-Academy-main/Currentproject/shared: {}
+
+  ../../../Zopkit-ITA-SM-main: {}
+
+  ../../../Zopkit-ITA-SM-main/apps/api: {}
+
+  ../../../Zopkit-ITA-SM-main/apps/frontend: {}
+
+  ../../../Zopkit-ITA-SM-main/js/modules: {}
+
+  ../../../Zopkit-ITA-SM-main/js/src/vue: {}
+
+  ../../../Zopkit-ITA-SM-main/packages/database: {}
+
+  ../../../Zopkit-ITA-SM-main/packages/plugin-system: {}
+
+  ../../../Zopkit-ITA-SM-main/packages/shared: {}
+
+  ../../../Zopkit-ITA-SM-main/tests/js/modules: {}
+
+  ../../../flowtilla-main: {}
+
+  ../../../flowtilla-main/src: {}
+
+  ../../packages/common: {}
+
+  ../frontend: {}
+
+packages:
+
+  '@types/bcryptjs@3.0.0':
+    resolution: {integrity: sha512-WRZOuCuaz8UcZZE4R5HXTco2goQSI2XxjGY3hbM/xDvwmqFWd4ivooImsMx65OKM6CtNKbnZ5YL+YwAwK7c1dg==}
+    deprecated: This is a stub types definition. bcryptjs provides its own type definitions, so you do not need this installed.
+
+  bcryptjs@3.0.3:
+    resolution: {integrity: sha512-GlF5wPWnSa/X5LKM1o0wz0suXIINz1iHRLvTS+sLyi7XPbe5ycmYI3DlZqVGZZtDgl4DmasFg7gOB3JYbphV5g==}
+    hasBin: true
+
+snapshots:
+
+  '@types/bcryptjs@3.0.0':
+    dependencies:
+      bcryptjs: 3.0.3
+
+  bcryptjs@3.0.3: {}

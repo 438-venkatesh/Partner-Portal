@@ -1,0 +1,17 @@
+FROM node:20-alpine AS build
+WORKDIR /app
+COPY package.json package-lock.json* ./
+COPY apps/backend/package.json apps/backend/
+COPY packages/common/package.json packages/common/
+RUN npm install -w @partner-portal/backend -w @partner-portal/common || npm install
+COPY . .
+RUN npm run build -w @partner-portal/backend || true
+
+FROM node:20-alpine
+WORKDIR /app
+ENV NODE_ENV=production
+COPY --from=build /app/apps/backend/dist ./dist
+COPY --from=build /app/apps/backend/package.json ./
+COPY --from=build /app/node_modules ./node_modules
+EXPOSE 3000
+CMD ["node", "dist/index.js"]
