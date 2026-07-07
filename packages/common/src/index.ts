@@ -9,5 +9,8 @@ export * from './schemas/deals';
 export * from './schemas/leads';
 export * from './schemas/commissions';
 export * from './schemas/mdf';
+export * from './schemas/serviceCatalog';
+export * from './schemas/training';
+export * from './schemas/enablement';
 export * from './partnerOnboardingByType';
 

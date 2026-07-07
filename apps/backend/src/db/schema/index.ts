@@ -17,6 +17,8 @@ export * from './partnerRelationship';
 export * from './dealRegistration';
 export * from './commissions';
 export * from './mdf';
+export * from './training';
+export * from './enablementContent';
 
 // Re-export for convenience
 import { partners, partnerUsers } from './partners';
@@ -66,6 +68,14 @@ import {
   challengeCompletions,
 } from './commissions';
 import { mdfFunds, mdfRequests } from './mdf';
+import {
+  trainingCourses,
+  trainingLessons,
+  trainingQuizQuestions,
+  trainingEnrollments,
+  learningPaths,
+} from './training';
+import { salesPlaybooks, marketingAssets } from './enablementContent';
 
 export const schema = {
   partners,
@@ -117,4 +127,11 @@ export const schema = {
   challengeCompletions,
   mdfFunds,
   mdfRequests,
+  trainingCourses,
+  trainingLessons,
+  trainingQuizQuestions,
+  trainingEnrollments,
+  learningPaths,
+  salesPlaybooks,
+  marketingAssets,
 };

@@ -7,6 +7,10 @@ import {
 import { tenants } from '../db/schema/tenants';
 import { adminUsers } from '../db/schema/adminUsers';
 import { eq, and } from 'drizzle-orm';
+import { parseCsvWithHeader } from '../utils/csv';
+import { collectMultipartUpload } from '../utils/readMultipartField';
+import { serviceImportRowSchema, type CreateServiceInput } from '@partner-portal/common';
+import type { FastifyRequest } from 'fastify';
 
 function flattenRelationshipRow(row: {
   relationship: typeof partnerTenantServiceRelationships.$inferSelect;
@@ -285,8 +289,82 @@ export const serviceService = {
     if (!relationship) {
       throw new Error('Relationship not found');
     }
-    
+
     return relationship;
+  },
+
+  // ---- catalog management (create/update/delete/bulk import) ----
+
+  async listAllServices() {
+    return db.select().from(partnerServices);
+  },
+
+  async createService(input: CreateServiceInput) {
+    const [service] = await db
+      .insert(partnerServices)
+      .values({
+        serviceCode: input.serviceCode,
+        serviceName: input.serviceName,
+        serviceCategory: input.serviceCategory,
+        description: input.description,
+        requiredDocuments: input.requiredDocuments ?? [],
+        isActive: input.isActive ?? true,
+      })
+      .returning();
+    return service;
+  },
+
+  async updateService(serviceId: string, patch: Partial<CreateServiceInput>) {
+    const [service] = await db
+      .update(partnerServices)
+      .set({ ...patch, updatedAt: new Date() })
+      .where(eq(partnerServices.serviceId, serviceId))
+      .returning();
+    return service ?? null;
+  },
+
+  async deleteService(serviceId: string) {
+    await db.delete(partnerServices).where(eq(partnerServices.serviceId, serviceId));
+  },
+
+  /** Bulk-adds catalog entries from an uploaded CSV — the same shape as the category-1 partner importer. */
+  async importServicesFromCsv(request: FastifyRequest) {
+    const { file } = await collectMultipartUpload(request);
+    if (!file) {
+      throw new Error('No CSV file uploaded. Send it as multipart form-data under any file field.');
+    }
+
+    const rows = parseCsvWithHeader(file.buffer.toString('utf-8'));
+    const report = {
+      total: rows.length,
+      succeeded: 0,
+      failed: 0,
+      rows: [] as Array<{ row: number; status: 'created' | 'error'; serviceId?: string; error?: string }>,
+    };
+
+    for (let i = 0; i < rows.length; i++) {
+      const rowNumber = i + 2;
+      try {
+        const parsed = serviceImportRowSchema.parse({
+          serviceCode: rows[i].serviceCode,
+          serviceName: rows[i].serviceName,
+          serviceCategory: rows[i].serviceCategory,
+          description: rows[i].description || undefined,
+        });
+        const created = await this.createService(parsed);
+        report.succeeded++;
+        report.rows.push({ row: rowNumber, status: 'created', serviceId: created.serviceId });
+      } catch (error: any) {
+        report.failed++;
+        const message =
+          error?.issues?.map((issue: any) => `${issue.path.join('.')}: ${issue.message}`).join('; ') ||
+          error?.message ||
+          'Unknown error';
+        report.rows.push({ row: rowNumber, status: 'error', error: message });
+      }
+    }
+
+    return report;
   },
 };
 

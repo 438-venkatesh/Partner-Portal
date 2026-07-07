@@ -20,6 +20,7 @@ import { Route as PartnerTiersIndexRouteImport } from './routes/partner-tiers/in
 import { Route as PartnerSegmentsIndexRouteImport } from './routes/partner-segments/index'
 import { Route as PartnerOperationsIndexRouteImport } from './routes/partner-operations/index'
 import { Route as LogisticsIndexRouteImport } from './routes/logistics/index'
+import { Route as EnablementIndexRouteImport } from './routes/enablement/index'
 import { Route as DirectoryIndexRouteImport } from './routes/directory/index'
 import { Route as BillingIndexRouteImport } from './routes/billing/index'
 import { Route as AccountMappingIndexRouteImport } from './routes/account-mapping/index'
@@ -42,6 +43,7 @@ import { Route as PartnerRegisterRouteImport } from './routes/partner/register'
 import { Route as PartnerOnboardingRouteImport } from './routes/partner/onboarding'
 import { Route as PartnerLoginRouteImport } from './routes/partner/login'
 import { Route as PartnerForgotPasswordRouteImport } from './routes/partner/forgot-password'
+import { Route as PartnerEnablementRouteImport } from './routes/partner/enablement'
 import { Route as PartnerEmployeesRouteImport } from './routes/partner/employees'
 import { Route as PartnerDocumentsRouteImport } from './routes/partner/documents'
 import { Route as PartnerDashboardRouteImport } from './routes/partner/dashboard'
@@ -117,6 +119,11 @@ const PartnerOperationsIndexRoute = PartnerOperationsIndexRouteImport.update({
 const LogisticsIndexRoute = LogisticsIndexRouteImport.update({
   id: '/logistics/',
   path: '/logistics/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EnablementIndexRoute = EnablementIndexRouteImport.update({
+  id: '/enablement/',
+  path: '/enablement/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DirectoryIndexRoute = DirectoryIndexRouteImport.update({
@@ -228,6 +235,11 @@ const PartnerLoginRoute = PartnerLoginRouteImport.update({
 const PartnerForgotPasswordRoute = PartnerForgotPasswordRouteImport.update({
   id: '/partner/forgot-password',
   path: '/partner/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PartnerEnablementRoute = PartnerEnablementRouteImport.update({
+  id: '/partner/enablement',
+  path: '/partner/enablement',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PartnerEmployeesRoute = PartnerEmployeesRouteImport.update({
@@ -362,6 +374,7 @@ export interface FileRoutesByFullPath {
   '/partner/dashboard': typeof PartnerDashboardRoute
   '/partner/documents': typeof PartnerDocumentsRoute
   '/partner/employees': typeof PartnerEmployeesRoute
+  '/partner/enablement': typeof PartnerEnablementRoute
   '/partner/forgot-password': typeof PartnerForgotPasswordRoute
   '/partner/login': typeof PartnerLoginRoute
   '/partner/onboarding': typeof PartnerOnboardingRouteWithChildren
@@ -384,6 +397,7 @@ export interface FileRoutesByFullPath {
   '/account-mapping': typeof AccountMappingIndexRoute
   '/billing': typeof BillingIndexRoute
   '/directory': typeof DirectoryIndexRoute
+  '/enablement': typeof EnablementIndexRoute
   '/logistics': typeof LogisticsIndexRoute
   '/partner-operations': typeof PartnerOperationsIndexRoute
   '/partner-segments': typeof PartnerSegmentsIndexRoute
@@ -419,6 +433,7 @@ export interface FileRoutesByTo {
   '/partner/dashboard': typeof PartnerDashboardRoute
   '/partner/documents': typeof PartnerDocumentsRoute
   '/partner/employees': typeof PartnerEmployeesRoute
+  '/partner/enablement': typeof PartnerEnablementRoute
   '/partner/forgot-password': typeof PartnerForgotPasswordRoute
   '/partner/login': typeof PartnerLoginRoute
   '/partner/onboarding': typeof PartnerOnboardingRouteWithChildren
@@ -440,6 +455,7 @@ export interface FileRoutesByTo {
   '/account-mapping': typeof AccountMappingIndexRoute
   '/billing': typeof BillingIndexRoute
   '/directory': typeof DirectoryIndexRoute
+  '/enablement': typeof EnablementIndexRoute
   '/logistics': typeof LogisticsIndexRoute
   '/partner-operations': typeof PartnerOperationsIndexRoute
   '/partner-segments': typeof PartnerSegmentsIndexRoute
@@ -476,6 +492,7 @@ export interface FileRoutesById {
   '/partner/dashboard': typeof PartnerDashboardRoute
   '/partner/documents': typeof PartnerDocumentsRoute
   '/partner/employees': typeof PartnerEmployeesRoute
+  '/partner/enablement': typeof PartnerEnablementRoute
   '/partner/forgot-password': typeof PartnerForgotPasswordRoute
   '/partner/login': typeof PartnerLoginRoute
   '/partner/onboarding': typeof PartnerOnboardingRouteWithChildren
@@ -498,6 +515,7 @@ export interface FileRoutesById {
   '/account-mapping/': typeof AccountMappingIndexRoute
   '/billing/': typeof BillingIndexRoute
   '/directory/': typeof DirectoryIndexRoute
+  '/enablement/': typeof EnablementIndexRoute
   '/logistics/': typeof LogisticsIndexRoute
   '/partner-operations/': typeof PartnerOperationsIndexRoute
   '/partner-segments/': typeof PartnerSegmentsIndexRoute
@@ -535,6 +553,7 @@ export interface FileRouteTypes {
     | '/partner/dashboard'
     | '/partner/documents'
     | '/partner/employees'
+    | '/partner/enablement'
     | '/partner/forgot-password'
     | '/partner/login'
     | '/partner/onboarding'
@@ -557,6 +576,7 @@ export interface FileRouteTypes {
     | '/account-mapping'
     | '/billing'
     | '/directory'
+    | '/enablement'
     | '/logistics'
     | '/partner-operations'
     | '/partner-segments'
@@ -592,6 +612,7 @@ export interface FileRouteTypes {
     | '/partner/dashboard'
     | '/partner/documents'
     | '/partner/employees'
+    | '/partner/enablement'
     | '/partner/forgot-password'
     | '/partner/login'
     | '/partner/onboarding'
@@ -613,6 +634,7 @@ export interface FileRouteTypes {
     | '/account-mapping'
     | '/billing'
     | '/directory'
+    | '/enablement'
     | '/logistics'
     | '/partner-operations'
     | '/partner-segments'
@@ -648,6 +670,7 @@ export interface FileRouteTypes {
     | '/partner/dashboard'
     | '/partner/documents'
     | '/partner/employees'
+    | '/partner/enablement'
     | '/partner/forgot-password'
     | '/partner/login'
     | '/partner/onboarding'
@@ -670,6 +693,7 @@ export interface FileRouteTypes {
     | '/account-mapping/'
     | '/billing/'
     | '/directory/'
+    | '/enablement/'
     | '/logistics/'
     | '/partner-operations/'
     | '/partner-segments/'
@@ -706,6 +730,7 @@ export interface RootRouteChildren {
   PartnerDashboardRoute: typeof PartnerDashboardRoute
   PartnerDocumentsRoute: typeof PartnerDocumentsRoute
   PartnerEmployeesRoute: typeof PartnerEmployeesRoute
+  PartnerEnablementRoute: typeof PartnerEnablementRoute
   PartnerForgotPasswordRoute: typeof PartnerForgotPasswordRoute
   PartnerLoginRoute: typeof PartnerLoginRoute
   PartnerOnboardingRoute: typeof PartnerOnboardingRouteWithChildren
@@ -728,6 +753,7 @@ export interface RootRouteChildren {
   AccountMappingIndexRoute: typeof AccountMappingIndexRoute
   BillingIndexRoute: typeof BillingIndexRoute
   DirectoryIndexRoute: typeof DirectoryIndexRoute
+  EnablementIndexRoute: typeof EnablementIndexRoute
   LogisticsIndexRoute: typeof LogisticsIndexRoute
   PartnerOperationsIndexRoute: typeof PartnerOperationsIndexRoute
   PartnerSegmentsIndexRoute: typeof PartnerSegmentsIndexRoute
@@ -818,6 +844,13 @@ declare module '@tanstack/react-router' {
       path: '/logistics'
       fullPath: '/logistics'
       preLoaderRoute: typeof LogisticsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/enablement/': {
+      id: '/enablement/'
+      path: '/enablement'
+      fullPath: '/enablement'
+      preLoaderRoute: typeof EnablementIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/directory/': {
@@ -972,6 +1005,13 @@ declare module '@tanstack/react-router' {
       path: '/partner/forgot-password'
       fullPath: '/partner/forgot-password'
       preLoaderRoute: typeof PartnerForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/partner/enablement': {
+      id: '/partner/enablement'
+      path: '/partner/enablement'
+      fullPath: '/partner/enablement'
+      preLoaderRoute: typeof PartnerEnablementRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/partner/employees': {
@@ -1233,6 +1273,7 @@ const rootRouteChildren: RootRouteChildren = {
   PartnerDashboardRoute: PartnerDashboardRoute,
   PartnerDocumentsRoute: PartnerDocumentsRoute,
   PartnerEmployeesRoute: PartnerEmployeesRoute,
+  PartnerEnablementRoute: PartnerEnablementRoute,
   PartnerForgotPasswordRoute: PartnerForgotPasswordRoute,
   PartnerLoginRoute: PartnerLoginRoute,
   PartnerOnboardingRoute: PartnerOnboardingRouteWithChildren,
@@ -1255,6 +1296,7 @@ const rootRouteChildren: RootRouteChildren = {
   AccountMappingIndexRoute: AccountMappingIndexRoute,
   BillingIndexRoute: BillingIndexRoute,
   DirectoryIndexRoute: DirectoryIndexRoute,
+  EnablementIndexRoute: EnablementIndexRoute,
   LogisticsIndexRoute: LogisticsIndexRoute,
   PartnerOperationsIndexRoute: PartnerOperationsIndexRoute,
   PartnerSegmentsIndexRoute: PartnerSegmentsIndexRoute,

@@ -87,6 +87,43 @@ export const cloudinaryService = {
     });
   },
 
+  async uploadAsset(opts: {
+    buffer: Buffer;
+    mimetype: string;
+    originalFilename: string;
+  }): Promise<{ secureUrl: string; publicId: string; resourceType: 'image' | 'video' | 'raw' }> {
+    ensureConfigured();
+    const resourceType = resourceTypeForMime(opts.mimetype);
+    const safeName = opts.originalFilename.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 120) || 'asset';
+
+    return new Promise((resolve, reject) => {
+      const uploadOptions: Record<string, unknown> = {
+        folder: 'partner-portal/marketing-assets',
+        resource_type: resourceType,
+        public_id: `${Date.now()}-${safeName}`,
+        overwrite: false,
+        access_mode: 'public',
+      };
+
+      const stream = cloudinary.uploader.upload_stream(uploadOptions, (error, result) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+        if (!result?.secure_url || !result.public_id) {
+          reject(new Error('Cloudinary upload returned no URL'));
+          return;
+        }
+        resolve({
+          secureUrl: result.secure_url,
+          publicId: result.public_id,
+          resourceType: (result.resource_type as 'image' | 'video' | 'raw') || resourceType,
+        });
+      });
+      stream.end(opts.buffer);
+    });
+  },
+
   /**
    * Build a delivery URL for public uploads. Do not use sign_url/expires_at here —
    * those break inline PDF viewing for standard public assets.

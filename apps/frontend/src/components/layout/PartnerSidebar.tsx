@@ -21,6 +21,7 @@ import {
   ListChecks,
   Package,
   Truck,
+  GraduationCap,
 } from 'lucide-react';
 import { usePartnerAuthStore } from '@/lib/stores/partnerAuthStore';
 import { partnerDashboardApi } from '@/lib/api/partnerDashboard';
@@ -118,6 +119,7 @@ export function PartnerSidebar() {
       items: [
         { to: '/partner/dashboard', label: 'Dashboard', icon: LayoutDashboard },
         { to: '/partner/revenue', label: 'Deals & revenue', icon: DollarSign },
+        { to: '/partner/enablement', label: 'Enablement', icon: GraduationCap },
       ],
     },
     ...(showClientManagement

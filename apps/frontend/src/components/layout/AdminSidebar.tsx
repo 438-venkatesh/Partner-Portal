@@ -24,6 +24,7 @@ import {
   Layers,
   Share2,
   DollarSign,
+  GraduationCap,
 } from 'lucide-react';
 import { useAuthStore } from '@/lib/stores/authStore';
 import { useNavigate } from '@tanstack/react-router';
@@ -70,6 +71,7 @@ export function AdminSidebar() {
       items: [
         { to: '/partners', label: 'Dashboard', icon: LayoutDashboard },
         { to: '/revenue', label: 'Deals & revenue', icon: DollarSign },
+        { to: '/enablement', label: 'Enablement', icon: GraduationCap },
         { to: '/billing', label: 'Billing', icon: CreditCard },
       ],
     },

@@ -42,6 +42,10 @@ import { partnerCommissionsPortalRoutes } from './routes/partnerCommissionsPorta
 import { mdfRoutes } from './routes/mdf';
 import { partnerMdfPortalRoutes } from './routes/partnerMdfPortal';
 import { accountMappingRoutes } from './routes/accountMapping';
+import { trainingRoutes } from './routes/training';
+import { partnerTrainingPortalRoutes } from './routes/partnerTrainingPortal';
+import { enablementContentRoutes } from './routes/enablementContent';
+import { partnerEnablementPortalRoutes } from './routes/partnerEnablementPortal';
 import { mockDataService } from './services/mockDataService';
 import { dbPool } from './db';
 
@@ -102,6 +106,10 @@ async function start() {
     await server.register(serviceRoutes, { prefix: '/api/services' });
     await server.register(productRoutes, { prefix: '/api/products' });
     await server.register(invoiceRoutes, { prefix: '/api/invoices' });
+    await server.register(trainingRoutes, { prefix: '/api/training' });
+    await server.register(partnerTrainingPortalRoutes, { prefix: '/api/partner-training' });
+    await server.register(enablementContentRoutes, { prefix: '/api/enablement' });
+    await server.register(partnerEnablementPortalRoutes, { prefix: '/api/partner-enablement' });
 
     await server.register(partnerAuthRoutes, { prefix: '/api/partner-auth' });
     server.post('/api/partner-auth/resend-verification', handleResendVerification);
