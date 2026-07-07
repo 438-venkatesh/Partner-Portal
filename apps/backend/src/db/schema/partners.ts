@@ -33,6 +33,8 @@ export const partners = pgTable('partners', {
   dataRetentionDays: integer('data_retention_days'),
   isDirectoryListed: boolean('is_directory_listed').default(true),
   piiPurgedAt: timestamp('pii_purged_at'),
+  tags: jsonb('tags').default([]),
+  accountManagerId: uuid('account_manager_id'),
 });
 
 export const partnerUsers = pgTable('partner_users', {

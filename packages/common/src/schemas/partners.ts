@@ -74,6 +74,8 @@ export const partnerResponseSchema = z.object({
   website: z.string().nullable(),
   description: z.string().nullable(),
   metadata: z.record(z.unknown()),
+  tags: z.array(z.string()).nullable().optional(),
+  accountManagerId: z.string().uuid().nullable().optional(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });

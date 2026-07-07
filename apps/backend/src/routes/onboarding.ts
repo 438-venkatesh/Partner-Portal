@@ -25,6 +25,7 @@ import { z } from 'zod';
 import { zodToFastifySchema } from '../utils/schemaConverter';
 import { onboardingStageConfigService } from '../services/onboardingStageConfigService';
 import { onboardingAnalyticsService } from '../services/onboardingAnalyticsService';
+import { tierService } from '../services/tierService';
 
 export async function onboardingRoutes(fastify: FastifyInstance) {
   fastify.addHook('onRequest', authenticate);
@@ -65,6 +66,7 @@ export async function onboardingRoutes(fastify: FastifyInstance) {
         request.user
       );
       await autoApprovalService.maybeAutoApprove(request.params.partnerId);
+      await tierService.evaluateAndPromote(request.params.partnerId);
       return reply.send(workflow);
     } catch (error: any) {
       const message = error instanceof Error ? error.message : 'Update failed';
@@ -92,6 +94,7 @@ export async function onboardingRoutes(fastify: FastifyInstance) {
         request.body
       );
       await autoApprovalService.maybeAutoApprove(request.params.partnerId);
+      await tierService.evaluateAndPromote(request.params.partnerId);
       return reply.send(workflow);
     } catch (error: any) {
       const message = error instanceof Error ? error.message : 'Approve failed';

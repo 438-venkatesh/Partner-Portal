@@ -13,6 +13,7 @@ export * from './notifications';
 export * from './tenants';
 export * from './commercial';
 export * from './onboardingConfig';
+export * from './partnerRelationship';
 
 // Re-export for convenience
 import { partners, partnerUsers } from './partners';
@@ -48,6 +49,12 @@ import {
   partnerAutoApprovalRules,
   onboardingReminderLog,
 } from './onboardingConfig';
+import {
+  partnerTierDefinitions,
+  partnerSegments,
+  partnerBusinessPlans,
+  partnerRewardTransactions,
+} from './partnerRelationship';
 
 export const schema = {
   partners,
@@ -86,4 +93,8 @@ export const schema = {
   onboardingStageSettings,
   partnerAutoApprovalRules,
   onboardingReminderLog,
+  partnerTierDefinitions,
+  partnerSegments,
+  partnerBusinessPlans,
+  partnerRewardTransactions,
 };

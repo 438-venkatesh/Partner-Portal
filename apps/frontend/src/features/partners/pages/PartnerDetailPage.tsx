@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useParams, Link } from '@tanstack/react-router';
 import { partnerApi } from '@/lib/api/partners';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Button } from '@/components/ui/button';
@@ -19,6 +19,7 @@ import { logisticsApi } from '@/lib/api/logistics';
 import { useNavigate } from '@tanstack/react-router';
 import { PartnerActivityPanel } from '../components/PartnerActivityPanel';
 import { PartnerAgreementsPanel } from '../components/PartnerAgreementsPanel';
+import { PartnerRelationshipPanel } from '../components/PartnerRelationshipPanel';
 
 export function PartnerDetailPage() {
   const { partnerId } = useParams({ from: '/partners/$partnerId/' });
@@ -183,6 +184,7 @@ export function PartnerDetailPage() {
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList className="flex flex-wrap h-auto gap-1">
           <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="relationship">Relationship</TabsTrigger>
           <TabsTrigger value="services">Services</TabsTrigger>
           <TabsTrigger value="documents">Documents</TabsTrigger>
           <TabsTrigger value="agreements">Agreements</TabsTrigger>
@@ -201,6 +203,14 @@ export function PartnerDetailPage() {
               </p>
             </CardContent>
           </Card>
+        </TabsContent>
+        <TabsContent value="relationship">
+          <PartnerRelationshipPanel
+            partnerId={partnerId}
+            tier={data.tier ?? null}
+            tags={(data.tags as string[] | null) ?? []}
+            accountManagerId={(data as any).accountManagerId ?? null}
+          />
         </TabsContent>
         <TabsContent value="services">
           <ServiceRelationships partnerId={partnerId} canCreate canApprove />

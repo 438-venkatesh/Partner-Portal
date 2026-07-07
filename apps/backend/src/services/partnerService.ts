@@ -430,6 +430,26 @@ export const partnerService = {
     return partner;
   },
 
+  async updateTags(partnerId: string, tags: string[]) {
+    const [partner] = await db
+      .update(partners)
+      .set({ tags, updatedAt: new Date() })
+      .where(eq(partners.partnerId, partnerId))
+      .returning();
+    if (!partner) throw new Error('Partner not found');
+    return partner;
+  },
+
+  async assignAccountManager(partnerId: string, accountManagerId: string | null) {
+    const [partner] = await db
+      .update(partners)
+      .set({ accountManagerId, updatedAt: new Date() })
+      .where(eq(partners.partnerId, partnerId))
+      .returning();
+    if (!partner) throw new Error('Partner not found');
+    return partner;
+  },
+
   /**
    * Offboards a partner: distinct from suspend. Marks the record inactive and starts the
    * data-retention countdown; a partner in this state is picked up later by the retention

@@ -4,6 +4,9 @@ import { zodToFastifySchema } from '../utils/schemaConverter';
 import { operationsAuthService, type AdminRole } from '../services/operationsAuthService';
 import { authenticate } from '../middleware/auth';
 import { routeRateLimitLogin } from '../config/rateLimit';
+import { db } from '../db';
+import { adminUsers } from '../db/schema';
+import { eq } from 'drizzle-orm';
 
 const loginBodySchema = z.object({
   email: z.string().email(),
@@ -113,4 +116,13 @@ export async function authRoutes(fastify: FastifyInstance) {
       }
     }
   );
+
+  // Lightweight staff directory — used to populate "assign an account manager" pickers.
+  fastify.get('/users', { preHandler: authenticate }, async (_request, reply) => {
+    const users = await db
+      .select({ adminId: adminUsers.adminId, email: adminUsers.email, role: adminUsers.role })
+      .from(adminUsers)
+      .where(eq(adminUsers.isActive, true));
+    return reply.send({ users });
+  });
 }

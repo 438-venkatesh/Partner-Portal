@@ -7,12 +7,22 @@ import { agreementService, AgreementTransitionError } from '../services/agreemen
 import { listPartnerActivity } from '../utils/activityLogger';
 import { partnerEmployeeService } from '../services/partnerEmployeeService';
 import { requireOperationsDbRole } from '../middleware/requireRole';
+import { tierService } from '../services/tierService';
+import { businessPlanService } from '../services/businessPlanService';
+import { rewardsService } from '../services/rewardsService';
+import { accountMappingService } from '../services/accountMappingService';
+import { partnerHealthService } from '../services/partnerHealthService';
 import {
   createPartnerSchema,
   updatePartnerSchema,
   partnerIdParamsSchema,
   approvePartnerSchema,
   offboardPartnerSchema,
+  createBusinessPlanSchema,
+  updateBusinessPlanSchema,
+  awardRewardPointsSchema,
+  assignAccountManagerSchema,
+  updatePartnerTagsSchema,
 } from '@partner-portal/common';
 import { zodToFastifySchema } from '../utils/schemaConverter';
 
@@ -246,6 +256,189 @@ export async function partnerRoutes(fastify: FastifyInstance) {
       return reply.send({ employees });
     }
   );
+
+  // ========== TIERS ==========
+
+  fastify.get(
+    '/:partnerId/tier-progress',
+    { schema: { params: zodToFastifySchema(partnerIdParamsSchema) } },
+    async (request, reply) => {
+      const { partnerId } = request.params as { partnerId: string };
+      const progress = await tierService.getTierProgress(partnerId);
+      return reply.send(progress);
+    }
+  );
+
+  fastify.put(
+    '/:partnerId/tier',
+    {
+      preHandler: requireOperationsDbRole('admin', 'superadmin'),
+      schema: {
+        params: zodToFastifySchema(partnerIdParamsSchema),
+        body: zodToFastifySchema(z.object({ tierCode: z.string().min(1).max(50) })),
+      },
+    },
+    async (request, reply) => {
+      const { partnerId } = request.params as { partnerId: string };
+      const { tierCode } = request.body as { tierCode: string };
+      const partner = await tierService.setTierManually(partnerId, tierCode, request.user?.userId);
+      return reply.send(partner);
+    }
+  );
+
+  // ========== TAGS & ACCOUNT MANAGER ==========
+
+  fastify.put(
+    '/:partnerId/tags',
+    {
+      preHandler: requireOperationsDbRole('admin', 'superadmin'),
+      schema: {
+        params: zodToFastifySchema(partnerIdParamsSchema),
+        body: zodToFastifySchema(updatePartnerTagsSchema),
+      },
+    },
+    async (request, reply) => {
+      const { partnerId } = request.params as { partnerId: string };
+      const partner = await partnerService.updateTags(partnerId, (request.body as { tags: string[] }).tags);
+      return reply.send(partner);
+    }
+  );
+
+  fastify.put(
+    '/:partnerId/account-manager',
+    {
+      preHandler: requireOperationsDbRole('admin', 'superadmin'),
+      schema: {
+        params: zodToFastifySchema(partnerIdParamsSchema),
+        body: zodToFastifySchema(assignAccountManagerSchema),
+      },
+    },
+    async (request, reply) => {
+      const { partnerId } = request.params as { partnerId: string };
+      const { accountManagerId } = request.body as { accountManagerId: string | null };
+      const partner = await partnerService.assignAccountManager(partnerId, accountManagerId);
+      return reply.send(partner);
+    }
+  );
+
+  // ========== BUSINESS PLANS ==========
+
+  fastify.get(
+    '/:partnerId/business-plans',
+    { schema: { params: zodToFastifySchema(partnerIdParamsSchema) } },
+    async (request, reply) => {
+      const { partnerId } = request.params as { partnerId: string };
+      const plans = await businessPlanService.listForPartner(partnerId);
+      return reply.send({ plans });
+    }
+  );
+
+  fastify.post(
+    '/:partnerId/business-plans',
+    {
+      preHandler: requireOperationsDbRole('admin', 'superadmin'),
+      schema: {
+        params: zodToFastifySchema(partnerIdParamsSchema),
+        body: zodToFastifySchema(createBusinessPlanSchema),
+      },
+    },
+    async (request, reply) => {
+      const { partnerId } = request.params as { partnerId: string };
+      const plan = await businessPlanService.create(partnerId, request.body as any, request.user?.userId);
+      return reply.code(201).send({ plan });
+    }
+  );
+
+  fastify.patch(
+    '/:partnerId/business-plans/:planId',
+    {
+      schema: {
+        params: zodToFastifySchema(partnerIdParamsSchema.extend({ planId: z.string().uuid() })),
+        body: zodToFastifySchema(updateBusinessPlanSchema),
+      },
+    },
+    async (request, reply) => {
+      const { partnerId, planId } = request.params as { partnerId: string; planId: string };
+      const plan = await businessPlanService.update(planId, partnerId, request.body as any);
+      if (!plan) return reply.code(404).send({ message: 'Plan not found' });
+      return reply.send({ plan });
+    }
+  );
+
+  fastify.delete(
+    '/:partnerId/business-plans/:planId',
+    {
+      preHandler: requireOperationsDbRole('admin', 'superadmin'),
+      schema: {
+        params: zodToFastifySchema(partnerIdParamsSchema.extend({ planId: z.string().uuid() })),
+      },
+    },
+    async (request, reply) => {
+      const { partnerId, planId } = request.params as { partnerId: string; planId: string };
+      const deleted = await businessPlanService.delete(planId, partnerId);
+      if (!deleted) return reply.code(404).send({ message: 'Plan not found' });
+      return reply.code(204).send();
+    }
+  );
+
+  // ========== REWARD POINTS ==========
+
+  fastify.get(
+    '/:partnerId/rewards',
+    { schema: { params: zodToFastifySchema(partnerIdParamsSchema) } },
+    async (request, reply) => {
+      const { partnerId } = request.params as { partnerId: string };
+      const [balance, transactions] = await Promise.all([
+        rewardsService.getBalance(partnerId),
+        rewardsService.listTransactions(partnerId),
+      ]);
+      return reply.send({ balance, transactions });
+    }
+  );
+
+  fastify.post(
+    '/:partnerId/rewards/award',
+    {
+      preHandler: requireOperationsDbRole('admin', 'superadmin'),
+      schema: {
+        params: zodToFastifySchema(partnerIdParamsSchema),
+        body: zodToFastifySchema(awardRewardPointsSchema),
+      },
+    },
+    async (request, reply) => {
+      const { partnerId } = request.params as { partnerId: string };
+      const { points, reason } = request.body as { points: number; reason: string };
+      const tx = await rewardsService.addPoints(partnerId, points, reason, request.user?.userId);
+      return reply.code(201).send({ transaction: tx });
+    }
+  );
+
+  // ========== ACCOUNT MAPPING & HEALTH ==========
+
+  fastify.get(
+    '/:partnerId/account-map',
+    { schema: { params: zodToFastifySchema(partnerIdParamsSchema) } },
+    async (request, reply) => {
+      const { partnerId } = request.params as { partnerId: string };
+      const map = await accountMappingService.getPartnerAccountMap(partnerId);
+      return reply.send({ tenants: map });
+    }
+  );
+
+  fastify.get(
+    '/:partnerId/health-score',
+    { schema: { params: zodToFastifySchema(partnerIdParamsSchema) } },
+    async (request, reply) => {
+      const { partnerId } = request.params as { partnerId: string };
+      const health = await partnerHealthService.computeHealthScore(partnerId);
+      return reply.send(health);
+    }
+  );
+
+  fastify.get('/health-scores', async (_request, reply) => {
+    const scores = await partnerHealthService.listHealthScores();
+    return reply.send({ scores });
+  });
 
   // Get partner by ID
   fastify.get('/:partnerId', {

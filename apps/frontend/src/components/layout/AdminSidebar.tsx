@@ -19,6 +19,10 @@ import {
   Settings,
   UploadCloud,
   Compass,
+  HeartPulse,
+  Award,
+  Layers,
+  Share2,
 } from 'lucide-react';
 import { useAuthStore } from '@/lib/stores/authStore';
 import { useNavigate } from '@tanstack/react-router';
@@ -74,6 +78,10 @@ export function AdminSidebar() {
         { to: '/onboarding/analytics', label: 'Onboarding analytics', icon: BarChart3 },
         { to: '/onboarding/settings', label: 'Onboarding settings', icon: Settings },
         { to: '/partners', label: 'All partners', icon: Users },
+        { to: '/partners/health', label: 'Partner health', icon: HeartPulse },
+        { to: '/partner-tiers', label: 'Tiers', icon: Award },
+        { to: '/partner-segments', label: 'Segments', icon: Layers },
+        { to: '/account-mapping', label: 'Account mapping', icon: Share2 },
         { to: '/partners/import', label: 'Bulk import', icon: UploadCloud },
         { to: '/directory', label: 'Partner directory', icon: Compass },
         { to: '/tenants', label: 'Tenants', icon: Building2 },

@@ -7,6 +7,7 @@ import { zodToFastifySchema } from '../utils/schemaConverter';
 import { collectMultipartUpload, trimField } from '../utils/readMultipartField';
 import { db } from '../db';
 import { partners } from '../db/schema/partners';
+import { tierService } from '../services/tierService';
 
 export async function documentRoutes(fastify: FastifyInstance) {
   fastify.addHook('onRequest', authenticate);
@@ -170,11 +171,12 @@ export async function documentRoutes(fastify: FastifyInstance) {
       })),
     },
   }, async (request, reply) => {
-    await documentService.verifyDocument(
+    const document = await documentService.verifyDocument(
       request.params.documentId,
       request.body,
       request.user
     );
+    await tierService.evaluateAndPromote(document.partnerId);
     return reply.code(204).send();
   });
 }

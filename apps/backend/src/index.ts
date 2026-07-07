@@ -31,6 +31,9 @@ import { partnerApiKeysPortalRoutes } from './routes/partnerApiKeysPortal';
 import { partnerWebhooksPortalRoutes } from './routes/partnerWebhooksPortal';
 import { integrationStubRoutes } from './routes/integrationStubs';
 import { partnerDirectoryRoutes } from './routes/partnerDirectory';
+import { partnerTierRoutes } from './routes/partnerTiers';
+import { partnerSegmentRoutes } from './routes/partnerSegments';
+import { accountMappingRoutes } from './routes/accountMapping';
 import { mockDataService } from './services/mockDataService';
 import { dbPool } from './db';
 
@@ -66,6 +69,9 @@ async function start() {
     await server.register(authRoutes, { prefix: '/api/auth' });
     await server.register(partnerDirectoryRoutes, { prefix: '/api/directory' });
     await server.register(partnerRoutes, { prefix: '/api/partners' });
+    await server.register(partnerTierRoutes, { prefix: '/api/partner-tiers' });
+    await server.register(partnerSegmentRoutes, { prefix: '/api/partner-segments' });
+    await server.register(accountMappingRoutes, { prefix: '/api/account-mapping' });
     await server.register(tenantRoutes, { prefix: '/api/tenants' });
     await server.register(billingAdminRoutes, { prefix: '/api/billing' });
     await server.register(partnerBillingPortalRoutes, { prefix: '/api/partner-billing' });

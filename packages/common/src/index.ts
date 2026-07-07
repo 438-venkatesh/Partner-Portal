@@ -4,5 +4,6 @@ export * from './schemas/logistics';
 export * from './schemas/supplierOnboarding';
 export * from './schemas/partnerOnboarding';
 export * from './schemas/onboardingLifecycle';
+export * from './schemas/partnerRelationship';
 export * from './partnerOnboardingByType';
 
