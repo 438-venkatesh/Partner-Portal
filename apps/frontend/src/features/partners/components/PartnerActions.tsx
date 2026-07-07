@@ -11,8 +11,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { FormTextarea } from '@/components/ui/form-field';
-import { CheckCircle2, XCircle, AlertTriangle } from 'lucide-react';
+import { FormTextarea, FormInput } from '@/components/ui/form-field';
+import { CheckCircle2, XCircle, AlertTriangle, UserMinus } from 'lucide-react';
 import {
   Tooltip,
   TooltipContent,
@@ -40,8 +40,11 @@ export function PartnerActions({
   const queryClient = useQueryClient();
   const [approveDialogOpen, setApproveDialogOpen] = useState(false);
   const [suspendDialogOpen, setSuspendDialogOpen] = useState(false);
+  const [offboardDialogOpen, setOffboardDialogOpen] = useState(false);
   const [approveNotes, setApproveNotes] = useState('');
   const [suspendReason, setSuspendReason] = useState('');
+  const [offboardReason, setOffboardReason] = useState('');
+  const [retentionDays, setRetentionDays] = useState('90');
 
   const approveMutation = useMutation({
     mutationFn: (notes?: string) => partnerApi.approve(partnerId, true, notes),
@@ -89,9 +92,35 @@ export function PartnerActions({
     },
   });
 
+  const offboardMutation = useMutation({
+    mutationFn: () =>
+      partnerApi.offboard(partnerId, {
+        reason: offboardReason || undefined,
+        retentionDays: retentionDays ? Number(retentionDays) : undefined,
+      }),
+    onSuccess: () => {
+      toast({
+        title: 'Partner offboarded',
+        description: `Their data will be permanently purged in ${retentionDays} days.`,
+      });
+      queryClient.invalidateQueries({ queryKey: ['partners', partnerId] });
+      queryClient.invalidateQueries({ queryKey: ['partners'] });
+      setOffboardDialogOpen(false);
+      setOffboardReason('');
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Error',
+        description: error.response?.data?.message || 'Failed to offboard partner',
+        variant: 'destructive',
+      });
+    },
+  });
+
   const isPending = currentStatus === 'pending';
   const isActive = currentStatus === 'active';
   const isSuspended = currentStatus === 'suspended';
+  const isOffboarded = currentStatus === 'terminated';
   const approvalBlocked = isPending && activationBlockers.length > 0;
 
   const approvePartnerButton = (
@@ -143,6 +172,12 @@ export function PartnerActions({
           >
             <CheckCircle2 className="mr-2 h-4 w-4" />
             Reactivate Partner
+          </Button>
+        )}
+        {canSuspend && !isOffboarded && (isActive || isSuspended) && (
+          <Button variant="outline" onClick={() => setOffboardDialogOpen(true)}>
+            <UserMinus className="mr-2 h-4 w-4" />
+            Offboard Partner
           </Button>
         )}
       </div>
@@ -240,6 +275,55 @@ export function PartnerActions({
               disabled={suspendMutation.isPending || !suspendReason.trim()}
             >
               {suspendMutation.isPending ? 'Suspending...' : 'Suspend Partner'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Offboard Dialog */}
+      <Dialog open={offboardDialogOpen} onOpenChange={setOffboardDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Offboard Partner</DialogTitle>
+            <DialogDescription>
+              This ends the partner relationship. Their personal data is permanently anonymized
+              once the retention window below elapses — this cannot be undone after that point.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="flex items-start space-x-3 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <AlertTriangle className="h-5 w-5 text-yellow-600 mt-0.5" />
+              <p className="text-sm text-yellow-700">
+                Access is revoked immediately. Financial and audit records are kept regardless of
+                the retention setting below — only the partner's identifying information is purged.
+              </p>
+            </div>
+            <FormInput
+              label="Retention period (days)"
+              type="number"
+              min={0}
+              value={retentionDays}
+              onChange={(e) => setRetentionDays(e.target.value)}
+              hint="How long to wait before permanently purging this partner's PII."
+            />
+            <FormTextarea
+              label="Reason (Optional)"
+              value={offboardReason}
+              onChange={(e) => setOffboardReason(e.target.value)}
+              placeholder="Why is this partner being offboarded?"
+              rows={3}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOffboardDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => offboardMutation.mutate()}
+              disabled={offboardMutation.isPending}
+            >
+              {offboardMutation.isPending ? 'Offboarding...' : 'Offboard Partner'}
             </Button>
           </DialogFooter>
         </DialogContent>

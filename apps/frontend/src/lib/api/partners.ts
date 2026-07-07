@@ -163,5 +163,22 @@ export const partnerApi = {
   deleteAgreement: async (partnerId: string, agreementId: string) => {
     await apiClient.delete(`/partners/${partnerId}/agreements/${agreementId}`);
   },
+
+  offboard: async (partnerId: string, input: { reason?: string; retentionDays?: number }) => {
+    const { data } = await apiClient.post<PartnerResponse>(`/partners/${partnerId}/offboard`, input);
+    return data;
+  },
+
+  importCsv: async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const { data } = await apiClient.post<{
+      total: number;
+      succeeded: number;
+      failed: number;
+      rows: Array<{ row: number; status: 'created' | 'error'; partnerId?: string; error?: string }>;
+    }>('/partners/import', formData);
+    return data;
+  },
 };
 

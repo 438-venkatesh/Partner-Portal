@@ -17,6 +17,7 @@ type ActivityType =
   | 'user_removed'
   | 'status_changed'
   | 'onboarding_stage_completed'
+  | 'partner_offboarded'
   | 'other';
 
 export async function logPartnerActivity(input: {

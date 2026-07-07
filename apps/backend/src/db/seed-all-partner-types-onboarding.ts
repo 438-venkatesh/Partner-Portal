@@ -335,7 +335,7 @@ async function exerciseGenericOnboardingCrud(
     errors.push(`[${label}] ${second} not in_progress after update`);
   }
 
-  if (isPartnerOnboardingComplete(wf, partnerType)) {
+  if (await isPartnerOnboardingComplete(wf, partnerType)) {
     errors.push(`[${label}] workflow should not be complete after 1 stage`);
   }
 

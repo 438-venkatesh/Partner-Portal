@@ -156,6 +156,7 @@ export const activityTypeEnum = pgEnum('activity_type', [
   'user_removed',
   'status_changed',
   'onboarding_stage_completed',
+  'partner_offboarded',
   'other'
 ]);
 

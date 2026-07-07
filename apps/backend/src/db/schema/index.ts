@@ -12,6 +12,7 @@ export * from './adminUsers';
 export * from './notifications';
 export * from './tenants';
 export * from './commercial';
+export * from './onboardingConfig';
 
 // Re-export for convenience
 import { partners, partnerUsers } from './partners';
@@ -42,6 +43,11 @@ import {
   partnerApiKeys,
   partnerWebhooks,
 } from './commercial';
+import {
+  onboardingStageSettings,
+  partnerAutoApprovalRules,
+  onboardingReminderLog,
+} from './onboardingConfig';
 
 export const schema = {
   partners,
@@ -77,4 +83,7 @@ export const schema = {
   permissionChangeAuditLogs,
   contextSwitching,
   partnerCalendarEvents,
+  onboardingStageSettings,
+  partnerAutoApprovalRules,
+  onboardingReminderLog,
 };

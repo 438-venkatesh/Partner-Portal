@@ -11,11 +11,11 @@ import {
   getServicePartnerOnboardingFlow,
   buildInitialPartnerOnboardingState,
   isPartnerOnboardingCompleteForType,
-  isPartnerOnboardingStageApplicable,
   PARTNER_REQUIRED_DOCUMENT_TYPES,
 } from '@partner-portal/common';
 import { partnerAuthService } from './partnerAuthService';
 import { agreementService } from './agreementService';
+import { onboardingStageConfigService } from './onboardingStageConfigService';
 import {
   PartnerStageValidationError,
   validateAdminCanApprovePartnerStage,
@@ -69,8 +69,12 @@ async function getPartnerType(partnerId: string): Promise<string> {
   return partner?.partnerType ?? 'agency';
 }
 
-function nextStage(stage: OnboardingStage, partnerType: string): OnboardingStage | null {
-  const order = getPartnerOnboardingStageOrder(partnerType);
+/** The stage order actually in effect for this partner type, after any admin overrides. */
+async function getEffectiveOrder(partnerType: string): Promise<OnboardingStage[]> {
+  return onboardingStageConfigService.getEffectiveOrder(partnerType);
+}
+
+function nextStage(stage: OnboardingStage, order: readonly OnboardingStage[]): OnboardingStage | null {
   const idx = order.indexOf(stage);
   if (idx < 0 || idx >= order.length - 1) return null;
   return order[idx + 1];
@@ -101,7 +105,7 @@ function buildStagesResponse(
     completedStages: string[];
     stageData: Record<string, StageEntry>;
   },
-  partnerType: string
+  order: readonly OnboardingStage[]
 ) {
   const stages: Record<
     string,
@@ -114,7 +118,6 @@ function buildStagesResponse(
     }
   > = {};
 
-  const order = getPartnerOnboardingStageOrder(partnerType);
   for (const stage of order) {
     const entry = workflow.stageData[stage] || {};
     const status = resolveStageStatus(stage, workflow);
@@ -131,10 +134,10 @@ function buildStagesResponse(
   return stages;
 }
 
-/** Auto-skip stages that do not apply to this partner type; fix current stage if needed. */
+/** Auto-skip stages that are not in the effective order for this partner type; fix current stage if needed. */
 async function reconcileWorkflowForPartnerType(
   partnerId: string,
-  partnerType: string,
+  order: readonly OnboardingStage[],
   row: {
     currentStage: string;
     stageStatus: string;
@@ -142,7 +145,6 @@ async function reconcileWorkflowForPartnerType(
     stageData: Record<string, StageEntry>;
   }
 ): Promise<typeof row | null> {
-  const order = getPartnerOnboardingStageOrder(partnerType);
   const completedStages = [...row.completedStages];
   const stageData = { ...row.stageData };
   let currentStage = row.currentStage as OnboardingStage;
@@ -173,7 +175,7 @@ async function reconcileWorkflowForPartnerType(
 
   if (!changed) return null;
 
-  const allDone = isPartnerOnboardingCompleteForType(partnerType, completedStages, stageData);
+  const allDone = isPartnerOnboardingCompleteForType('', completedStages, stageData, order);
   await db
     .update(partnerOnboardingWorkflows)
     .set({
@@ -189,7 +191,8 @@ async function reconcileWorkflowForPartnerType(
   return { currentStage, stageStatus: row.stageStatus, completedStages, stageData };
 }
 
-export function isPartnerOnboardingComplete(
+/** @deprecated use the async isPartnerOnboardingComplete which honors admin stage overrides */
+export function isPartnerOnboardingCompleteSync(
   wf: {
     overallStatus: string;
     completedStages: string[];
@@ -201,11 +204,24 @@ export function isPartnerOnboardingComplete(
   return isPartnerOnboardingCompleteForType(partnerType, wf.completedStages, wf.stages);
 }
 
-function workflowMeta(partnerType: string) {
+export async function isPartnerOnboardingComplete(
+  wf: {
+    overallStatus: string;
+    completedStages: string[];
+    stages: Record<string, { status: string }>;
+  },
+  partnerType: string
+): Promise<boolean> {
+  if (wf.overallStatus === 'blocked') return false;
+  const order = await getEffectiveOrder(partnerType);
+  return isPartnerOnboardingCompleteForType(partnerType, wf.completedStages, wf.stages, order);
+}
+
+function workflowMeta(partnerType: string, order: readonly OnboardingStage[]) {
   const flow = getServicePartnerOnboardingFlow(partnerType);
   return {
     partnerType,
-    stageOrder: [...flow.stageOrder],
+    stageOrder: [...order],
     flowTitle: flow.title,
     flowDescription: flow.description,
   };
@@ -266,7 +282,7 @@ export const onboardingService = {
     if (!row) return false;
 
     const docStage: OnboardingStage = 'documentation';
-    const order = getPartnerOnboardingStageOrder(partnerType);
+    const order = await getEffectiveOrder(partnerType);
     if (!order.includes(docStage)) return false;
 
     const completedStages = [...((row.completedStages as string[]) || [])];
@@ -315,11 +331,12 @@ export const onboardingService = {
 
   async getWorkflow(partnerId: string) {
     const partnerType = await getPartnerType(partnerId);
-    const meta = workflowMeta(partnerType);
+    const order = await getEffectiveOrder(partnerType);
+    const meta = workflowMeta(partnerType, order);
     let workflow = await this.loadWorkflowRow(partnerId);
 
     if (workflow) {
-      const reconciled = await reconcileWorkflowForPartnerType(partnerId, partnerType, {
+      const reconciled = await reconcileWorkflowForPartnerType(partnerId, order, {
         currentStage: workflow.currentStage,
         stageStatus: workflow.stageStatus,
         completedStages: (workflow.completedStages as string[]) || [],
@@ -348,15 +365,15 @@ export const onboardingService = {
           completedStages,
           stageData,
         },
-        partnerType
+        order
       );
 
-      const applicableDone = meta.stageOrder.filter(
+      const applicableDone = order.filter(
         (s) => completedStages.includes(s) || stages[s]?.status === 'skipped'
       ).length;
 
       let overallStatus: OnboardingStatus = 'pending';
-      if (isPartnerOnboardingCompleteForType(partnerType, completedStages, stageData)) {
+      if (isPartnerOnboardingCompleteForType(partnerType, completedStages, stageData, order)) {
         overallStatus = 'completed';
       } else if (workflow.stageStatus === 'blocked') {
         overallStatus = 'blocked';
@@ -390,7 +407,7 @@ export const onboardingService = {
         completedStages: initial.completedStages,
         stageData: initial.stageData as Record<string, StageEntry>,
       },
-      partnerType
+      order
     );
 
     return {
@@ -428,7 +445,8 @@ export const onboardingService = {
     extraStageData?: Record<string, unknown>
   ) {
     const partnerType = await getPartnerType(partnerId);
-    if (!isPartnerOnboardingStageApplicable(partnerType, stage)) {
+    const order = await getEffectiveOrder(partnerType);
+    if (!order.includes(stage)) {
       throw new PartnerStageValidationError('This stage does not apply to your partner type');
     }
 
@@ -448,8 +466,8 @@ export const onboardingService = {
       reviewedBy: actor.type === 'admin' ? actor.id : stageData[stage]?.reviewedBy,
     };
 
-    const next = nextStage(stage, partnerType);
-    const allDone = isPartnerOnboardingCompleteForType(partnerType, completedStages, stageData);
+    const next = nextStage(stage, order);
+    const allDone = isPartnerOnboardingCompleteForType(partnerType, completedStages, stageData, order);
 
     if (next) {
       if (!stageData[next]) stageData[next] = {};
@@ -481,7 +499,8 @@ export const onboardingService = {
     payload: Record<string, unknown>
   ) {
     const partnerType = await getPartnerType(partnerId);
-    if (!isPartnerOnboardingStageApplicable(partnerType, stage)) {
+    const order = await getEffectiveOrder(partnerType);
+    if (!order.includes(stage)) {
       throw new PartnerStageValidationError('This stage does not apply to your partner type');
     }
 
@@ -513,10 +532,11 @@ export const onboardingService = {
     payload?: Record<string, unknown>
   ) {
     const partnerType = await getPartnerType(partnerId);
-    const adminOnly = getPartnerAdminOnlyStages(partnerType);
-    const submitForReview = getPartnerSubmitForReviewStages(partnerType);
+    const order = await getEffectiveOrder(partnerType);
+    const adminOnly = getPartnerAdminOnlyStages(partnerType, order);
+    const submitForReview = getPartnerSubmitForReviewStages(partnerType, order);
 
-    if (!isPartnerOnboardingStageApplicable(partnerType, stage)) {
+    if (!order.includes(stage)) {
       throw new PartnerStageValidationError('This stage does not apply to your partner type');
     }
 
@@ -644,11 +664,11 @@ export const onboardingService = {
         .limit(1);
       if (!partner) continue;
 
-      const stageOrder = getPartnerOnboardingStageOrder(partner.partnerType);
-      const adminOnly = getPartnerAdminOnlyStages(partner.partnerType);
+      const order = await getEffectiveOrder(partner.partnerType);
+      const adminOnly = getPartnerAdminOnlyStages(partner.partnerType, order);
       const seen = new Set<string>();
 
-      for (const stage of stageOrder) {
+      for (const stage of order) {
         const entry = stageData[stage];
         if (entry?.submittedForReview) {
           const key = `${row.partnerId}:${stage}`;
@@ -721,6 +741,7 @@ export const onboardingService = {
     }
 
     const partnerType = await getPartnerType(partnerId);
+    const order = await getEffectiveOrder(partnerType);
     const row = await this.loadWorkflowRow(partnerId);
     const completedStages = [...((row?.completedStages as string[]) || [])];
     const stageData = { ...((row?.stageData as Record<string, StageEntry>) || {}) };
@@ -738,7 +759,7 @@ export const onboardingService = {
       if (index >= 0) completedStages.splice(index, 1);
     }
 
-    const allDone = isPartnerOnboardingCompleteForType(partnerType, completedStages, stageData);
+    const allDone = isPartnerOnboardingCompleteForType(partnerType, completedStages, stageData, order);
 
     return this.persistWorkflow(partnerId, {
       currentStage: data.stage as OnboardingStage,
@@ -756,7 +777,7 @@ export const onboardingService = {
     if (!row) return null;
 
     const partnerType = await getPartnerType(partnerId);
-    const order = getPartnerOnboardingStageOrder(partnerType);
+    const order = await getEffectiveOrder(partnerType);
     const completed = (row.completedStages as string[]) ?? [];
     const onAgreementStep = row.currentStage === 'agreement';
     const verificationDone =

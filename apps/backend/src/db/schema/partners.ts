@@ -31,6 +31,8 @@ export const partners = pgTable('partners', {
   updatedAt: timestamp('updated_at').defaultNow(),
   deletedAt: timestamp('deleted_at'),
   dataRetentionDays: integer('data_retention_days'),
+  isDirectoryListed: boolean('is_directory_listed').default(true),
+  piiPurgedAt: timestamp('pii_purged_at'),
 });
 
 export const partnerUsers = pgTable('partner_users', {

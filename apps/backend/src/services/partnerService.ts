@@ -1,3 +1,4 @@
+import type { FastifyRequest } from 'fastify';
 import { db } from '../db';
 import { partners } from '../db/schema/partners';
 import { partnerOnboardingWorkflows } from '../db/schema/advanced';
@@ -8,12 +9,17 @@ import { emailService } from './emailService';
 import { webhookDispatcher } from './webhookDispatcher';
 import { getPartnerActivationBlockers, partnerTypeFlags } from './partnerApprovalPreconditions';
 import { ensureSupplierOnboarding } from './supplierOnboardingBootstrap';
+import { collectMultipartUpload } from '../utils/readMultipartField';
+import { parseCsvWithHeader } from '../utils/csv';
 import {
   buildInitialPartnerOnboardingState,
+  partnerImportRowSchema,
   type CreatePartnerInput,
   type UpdatePartnerInput,
   type GetPartnersQuery,
 } from '@partner-portal/common';
+
+const DEFAULT_RETENTION_DAYS = 90;
 
 // Mock data for when database is unavailable
 const MOCK_PARTNERS = [
@@ -420,7 +426,98 @@ export const partnerService = {
         /* ignore */
       }
     }
-    
+
     return partner;
+  },
+
+  /**
+   * Offboards a partner: distinct from suspend. Marks the record inactive and starts the
+   * data-retention countdown; a partner in this state is picked up later by the retention
+   * purge job once dataRetentionDays has elapsed, which anonymizes their PII permanently.
+   */
+  async offboardPartner(
+    partnerId: string,
+    data: { reason?: string; retentionDays?: number },
+    user: any
+  ) {
+    const [existing] = await db
+      .select({ dataRetentionDays: partners.dataRetentionDays })
+      .from(partners)
+      .where(eq(partners.partnerId, partnerId))
+      .limit(1);
+    if (!existing) {
+      throw new Error('Partner not found');
+    }
+
+    const retentionDays = data.retentionDays ?? existing.dataRetentionDays ?? DEFAULT_RETENTION_DAYS;
+
+    const [partner] = await db
+      .update(partners)
+      .set({
+        status: 'terminated',
+        deletedAt: new Date(),
+        dataRetentionDays: retentionDays,
+        updatedAt: new Date(),
+      })
+      .where(eq(partners.partnerId, partnerId))
+      .returning();
+
+    await logPartnerActivity({
+      partnerId,
+      activityType: 'partner_offboarded',
+      activityDescription: `Partner offboarded by platform staff. Data will be purged after ${retentionDays} days.`,
+      performedBy: user.userId,
+      performedByType: 'platform_admin',
+      metadata: { reason: data.reason, retentionDays },
+    });
+
+    return partner;
+  },
+
+  /**
+   * Bulk-creates partners from an uploaded CSV. Every row goes through the same validation
+   * and onboarding-workflow bootstrap as a single createPartner() call; a bad row is reported,
+   * not fatal to the rest of the batch.
+   */
+  async importPartnersFromCsv(request: FastifyRequest, user: any) {
+    const { file } = await collectMultipartUpload(request);
+    if (!file) {
+      throw new Error('No CSV file uploaded. Send it as multipart form-data under any file field.');
+    }
+
+    const rows = parseCsvWithHeader(file.buffer.toString('utf-8'));
+    const report = {
+      total: rows.length,
+      succeeded: 0,
+      failed: 0,
+      rows: [] as Array<{ row: number; status: 'created' | 'error'; partnerId?: string; error?: string }>,
+    };
+
+    for (let i = 0; i < rows.length; i++) {
+      const rowNumber = i + 2; // +1 for header row, +1 for 1-indexing
+      try {
+        const parsed = partnerImportRowSchema.parse({
+          partnerName: rows[i].partnerName,
+          displayName: rows[i].displayName || undefined,
+          partnerType: rows[i].partnerType,
+          businessType: rows[i].businessType || undefined,
+          tier: rows[i].tier || undefined,
+          website: rows[i].website || undefined,
+          description: rows[i].description || undefined,
+        });
+        const created = await this.createPartner(parsed as CreatePartnerInput, user);
+        report.succeeded++;
+        report.rows.push({ row: rowNumber, status: 'created', partnerId: created.partnerId });
+      } catch (error: any) {
+        report.failed++;
+        const message =
+          error?.issues?.map((issue: any) => `${issue.path.join('.')}: ${issue.message}`).join('; ') ||
+          error?.message ||
+          'Unknown error';
+        report.rows.push({ row: rowNumber, status: 'error', error: message });
+      }
+    }
+
+    return report;
   },
 };

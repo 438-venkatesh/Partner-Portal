@@ -6,11 +6,13 @@ import { authenticate } from '../middleware/auth';
 import { agreementService, AgreementTransitionError } from '../services/agreementService';
 import { listPartnerActivity } from '../utils/activityLogger';
 import { partnerEmployeeService } from '../services/partnerEmployeeService';
+import { requireOperationsDbRole } from '../middleware/requireRole';
 import {
   createPartnerSchema,
   updatePartnerSchema,
   partnerIdParamsSchema,
   approvePartnerSchema,
+  offboardPartnerSchema,
 } from '@partner-portal/common';
 import { zodToFastifySchema } from '../utils/schemaConverter';
 
@@ -282,6 +284,7 @@ export async function partnerRoutes(fastify: FastifyInstance) {
 
   // Approve partner
   fastify.post('/:partnerId/approve', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
     schema: {
       params: zodToFastifySchema(partnerIdParamsSchema),
       body: zodToFastifySchema(approvePartnerSchema),
@@ -309,12 +312,37 @@ export async function partnerRoutes(fastify: FastifyInstance) {
 
   // Suspend partner
   fastify.post('/:partnerId/suspend', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
     schema: {
       params: zodToFastifySchema(partnerIdParamsSchema),
     },
   }, async (request, reply) => {
     await partnerService.suspendPartner(request.params.partnerId, request.user);
     return reply.code(204).send();
+  });
+
+  // Offboard partner — distinct from suspend: starts the data-retention countdown for PII purge.
+  fastify.post('/:partnerId/offboard', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
+    schema: {
+      params: zodToFastifySchema(partnerIdParamsSchema),
+      body: zodToFastifySchema(offboardPartnerSchema),
+    },
+  }, async (request, reply) => {
+    const partner = await partnerService.offboardPartner(
+      request.params.partnerId,
+      request.body,
+      request.user
+    );
+    return reply.send(partner);
+  });
+
+  // Bulk import partners from CSV
+  fastify.post('/import', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
+  }, async (request, reply) => {
+    const report = await partnerService.importPartnersFromCsv(request, request.user);
+    return reply.send(report);
   });
 }
 

@@ -6,6 +6,8 @@ import { agreementService } from '../services/agreementService';
 import { productService } from '../services/productService';
 import { supplierService } from '../services/supplierService';
 import { authenticate } from '../middleware/auth';
+import { requireOperationsDbRole } from '../middleware/requireRole';
+import { autoApprovalService } from '../services/autoApprovalService';
 import { db } from '../db';
 import { partnerAgreements } from '../db/schema';
 import { eq } from 'drizzle-orm';
@@ -14,9 +16,15 @@ import {
   rejectStageSchema,
   supplierOnboardingStageSchema,
   partnerOnboardingStageSchema,
+  partnerTypeSchema,
+  stageSettingUpdateSchema,
+  createAutoApprovalRuleSchema,
+  updateAutoApprovalRuleSchema,
 } from '@partner-portal/common';
 import { z } from 'zod';
 import { zodToFastifySchema } from '../utils/schemaConverter';
+import { onboardingStageConfigService } from '../services/onboardingStageConfigService';
+import { onboardingAnalyticsService } from '../services/onboardingAnalyticsService';
 
 export async function onboardingRoutes(fastify: FastifyInstance) {
   fastify.addHook('onRequest', authenticate);
@@ -35,6 +43,7 @@ export async function onboardingRoutes(fastify: FastifyInstance) {
 
   // Update partner onboarding stage
   fastify.put('/partner/:partnerId/stage', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
     schema: {
       params: zodToFastifySchema(z.object({ partnerId: z.string().uuid() })),
       body: zodToFastifySchema(z.object({
@@ -55,6 +64,7 @@ export async function onboardingRoutes(fastify: FastifyInstance) {
         request.body,
         request.user
       );
+      await autoApprovalService.maybeAutoApprove(request.params.partnerId);
       return reply.send(workflow);
     } catch (error: any) {
       const message = error instanceof Error ? error.message : 'Update failed';
@@ -63,6 +73,7 @@ export async function onboardingRoutes(fastify: FastifyInstance) {
   });
 
   fastify.post('/partner/:partnerId/stage/:stage/approve', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
     schema: {
       params: zodToFastifySchema(
         z.object({
@@ -80,6 +91,7 @@ export async function onboardingRoutes(fastify: FastifyInstance) {
         { type: 'admin', id: request.user?.userId },
         request.body
       );
+      await autoApprovalService.maybeAutoApprove(request.params.partnerId);
       return reply.send(workflow);
     } catch (error: any) {
       const message = error instanceof Error ? error.message : 'Approve failed';
@@ -88,6 +100,7 @@ export async function onboardingRoutes(fastify: FastifyInstance) {
   });
 
   fastify.post('/partner/:partnerId/stage/:stage/reject', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
     schema: {
       params: zodToFastifySchema(
         z.object({
@@ -131,6 +144,7 @@ export async function onboardingRoutes(fastify: FastifyInstance) {
 
   // Update supplier onboarding stage
   fastify.put('/supplier/:supplierId/stage', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
     schema: {
       params: zodToFastifySchema(z.object({ supplierId: z.string().uuid() })),
       body: zodToFastifySchema(z.object({
@@ -154,6 +168,7 @@ export async function onboardingRoutes(fastify: FastifyInstance) {
   });
 
   fastify.post('/supplier/:supplierId/stage/:stage/approve', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
     schema: {
       params: zodToFastifySchema(
         z.object({
@@ -179,6 +194,7 @@ export async function onboardingRoutes(fastify: FastifyInstance) {
   });
 
   fastify.post('/supplier/:supplierId/stage/:stage/reject', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
     schema: {
       params: zodToFastifySchema(
         z.object({
@@ -209,6 +225,7 @@ export async function onboardingRoutes(fastify: FastifyInstance) {
   });
 
   fastify.post('/supplier/:supplierId/catalog/approve-all', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
     schema: {
       params: zodToFastifySchema(z.object({ supplierId: z.string().uuid() })),
     },
@@ -228,6 +245,7 @@ export async function onboardingRoutes(fastify: FastifyInstance) {
   });
 
   fastify.post('/supplier/:supplierId/agreement', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
     schema: {
       params: zodToFastifySchema(z.object({ supplierId: z.string().uuid() })),
       body: zodToFastifySchema(
@@ -261,6 +279,7 @@ export async function onboardingRoutes(fastify: FastifyInstance) {
   });
 
   fastify.post('/supplier/:supplierId/agreement/:agreementId/countersign', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
     schema: {
       params: zodToFastifySchema(
         z.object({
@@ -305,6 +324,7 @@ export async function onboardingRoutes(fastify: FastifyInstance) {
 
   // Update logistics onboarding stage
   fastify.put('/logistics/:logisticsId/stage', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
     schema: {
       params: zodToFastifySchema(z.object({ logisticsId: z.string().uuid() })),
       body: zodToFastifySchema(z.object({
@@ -325,6 +345,89 @@ export async function onboardingRoutes(fastify: FastifyInstance) {
       request.user
     );
     return reply.send(workflow);
+  });
+
+  // ========== STAGE CONFIGURATION (admin-configurable onboarding workflow) ==========
+
+  fastify.get('/stage-config/:partnerType', {
+    schema: { params: zodToFastifySchema(z.object({ partnerType: partnerTypeSchema })) },
+  }, async (request, reply) => {
+    const stages = await onboardingStageConfigService.listForAdmin(
+      (request.params as { partnerType: string }).partnerType
+    );
+    return reply.send({ stages });
+  });
+
+  fastify.put('/stage-config/:partnerType/:stageCode', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
+    schema: {
+      params: zodToFastifySchema(
+        z.object({ partnerType: partnerTypeSchema, stageCode: partnerOnboardingStageSchema })
+      ),
+      body: zodToFastifySchema(stageSettingUpdateSchema),
+    },
+  }, async (request, reply) => {
+    const { partnerType, stageCode } = request.params as {
+      partnerType: string;
+      stageCode: any;
+    };
+    const setting = await onboardingStageConfigService.upsertSetting(
+      partnerType,
+      stageCode,
+      request.body as Record<string, unknown>,
+      request.user?.userId
+    );
+    return reply.send({ setting });
+  });
+
+  // ========== AUTO-APPROVAL RULES ==========
+
+  fastify.get('/auto-approval-rules', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
+  }, async (_request, reply) => {
+    const rules = await autoApprovalService.listRules();
+    return reply.send({ rules });
+  });
+
+  fastify.post('/auto-approval-rules', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
+    schema: { body: zodToFastifySchema(createAutoApprovalRuleSchema) },
+  }, async (request, reply) => {
+    const rule = await autoApprovalService.createRule(
+      request.body as any,
+      request.user?.userId
+    );
+    return reply.code(201).send({ rule });
+  });
+
+  fastify.patch('/auto-approval-rules/:ruleId', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
+    schema: {
+      params: zodToFastifySchema(z.object({ ruleId: z.string().uuid() })),
+      body: zodToFastifySchema(updateAutoApprovalRuleSchema),
+    },
+  }, async (request, reply) => {
+    const rule = await autoApprovalService.updateRule(
+      (request.params as { ruleId: string }).ruleId,
+      request.body as any
+    );
+    if (!rule) return reply.code(404).send({ message: 'Rule not found' });
+    return reply.send({ rule });
+  });
+
+  fastify.delete('/auto-approval-rules/:ruleId', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
+    schema: { params: zodToFastifySchema(z.object({ ruleId: z.string().uuid() })) },
+  }, async (request, reply) => {
+    await autoApprovalService.deleteRule((request.params as { ruleId: string }).ruleId);
+    return reply.code(204).send();
+  });
+
+  // ========== ONBOARDING ANALYTICS ==========
+
+  fastify.get('/analytics', async (_request, reply) => {
+    const analytics = await onboardingAnalyticsService.getAnalytics();
+    return reply.send(analytics);
   });
 }
 

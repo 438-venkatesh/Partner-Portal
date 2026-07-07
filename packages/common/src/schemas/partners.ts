@@ -24,13 +24,20 @@ export const createPartnerSchema = z.object({
   displayName: z.string().max(255).optional(),
   partnerType: partnerTypeSchema,
   businessType: z.enum(['b2b', 'b2c', 'both']).optional(),
+  tier: z.string().max(50).optional(),
   website: z.string().url().optional(),
   description: z.string().optional(),
   logoUrl: z.string().url().optional(),
   metadata: z.record(z.unknown()).optional(),
+  isDirectoryListed: z.boolean().optional(),
 });
 
 export const updatePartnerSchema = createPartnerSchema.partial();
+
+export const offboardPartnerSchema = z.object({
+  reason: z.string().max(2000).optional(),
+  retentionDays: z.coerce.number().int().min(0).max(3650).optional(),
+});
 
 export const partnerIdParamsSchema = z.object({
   partnerId: z.string().uuid(),

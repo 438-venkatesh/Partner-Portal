@@ -11,13 +11,22 @@ function isPartnerSelfServicePath(pathname: string): boolean {
   return pathname === '/partner' || pathname.startsWith('/partner/');
 }
 
+/** Public partner directory — anyone can browse it, no login of any kind required. */
+function isPublicDirectoryPath(pathname: string): boolean {
+  return pathname === '/directory' || pathname.startsWith('/directory/');
+}
+
 export const Route = createRootRoute({
   component: RootComponent,
   beforeLoad: ({ location }) => {
     const pathname = location.pathname;
 
-    // Operations Portal: require platform JWT (auth_token), except /login
-    if (!isPartnerSelfServicePath(pathname) && pathname !== '/login') {
+    // Operations Portal: require platform JWT (auth_token), except /login and the public directory
+    if (
+      !isPartnerSelfServicePath(pathname) &&
+      !isPublicDirectoryPath(pathname) &&
+      pathname !== '/login'
+    ) {
       const platformToken = localStorage.getItem('auth_token');
       if (!platformToken) {
         throw redirect({
@@ -100,8 +109,8 @@ function RootComponent() {
     );
   }
   
-  // Operations Portal login — full-screen only (no admin chrome)
-  if (pathname === '/login') {
+  // Operations Portal login / public directory — full-screen only (no admin chrome)
+  if (pathname === '/login' || isPublicDirectoryPath(pathname)) {
     return (
       <ErrorBoundary>
         <Outlet />

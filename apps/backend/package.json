@@ -20,6 +20,8 @@
     "db:seed-onboard-agency-documentation": "tsx scripts/seed-onboard-agency-documentation.ts",
     "db:seed-onboard-agency-agreement": "tsx scripts/seed-onboard-agency-agreement.ts",
     "db:studio": "drizzle-kit studio",
+    "onboarding:send-reminders": "tsx scripts/send-onboarding-reminders.ts",
+    "onboarding:purge-expired-partners": "tsx scripts/purge-expired-partners.ts",
     "test": "vitest run",
     "test:upload": "tsx scripts/test-document-upload.ts"
   },

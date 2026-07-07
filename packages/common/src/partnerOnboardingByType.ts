@@ -120,22 +120,105 @@ export function getPartnerOnboardingStageOrder(
 
 export function isPartnerOnboardingStageApplicable(
   partnerType: string,
-  stage: PartnerOnboardingStageCode
+  stage: PartnerOnboardingStageCode,
+  orderOverride?: readonly PartnerOnboardingStageCode[]
 ): boolean {
-  return getPartnerOnboardingStageOrder(partnerType).includes(stage);
+  const order = orderOverride ?? getPartnerOnboardingStageOrder(partnerType);
+  return order.includes(stage);
 }
 
 export function getPartnerSubmitForReviewStages(
-  partnerType: string
+  partnerType: string,
+  orderOverride?: readonly PartnerOnboardingStageCode[]
 ): PartnerOnboardingStageCode[] {
-  const order = new Set(getPartnerOnboardingStageOrder(partnerType));
+  const order = new Set(orderOverride ?? getPartnerOnboardingStageOrder(partnerType));
   return SUBMIT_FOR_REVIEW_CANDIDATES.filter((s) => order.has(s));
 }
 
-export function getPartnerAdminOnlyStages(partnerType: string): PartnerOnboardingStageCode[] {
-  const order = new Set(getPartnerOnboardingStageOrder(partnerType));
+export function getPartnerAdminOnlyStages(
+  partnerType: string,
+  orderOverride?: readonly PartnerOnboardingStageCode[]
+): PartnerOnboardingStageCode[] {
+  const order = new Set(orderOverride ?? getPartnerOnboardingStageOrder(partnerType));
   return ADMIN_ONLY_CANDIDATES.filter((s) => order.has(s));
 }
+
+/**
+ * Merge admin-configured per-stage overrides (enable/disable a stage, custom sort position) on
+ * top of a partner type's default stage order. Pure and framework-agnostic so it can run on
+ * either side of the stack; the backend is the only side that ever supplies real overrides today.
+ */
+export function applyStageOverrides(
+  baseOrder: readonly PartnerOnboardingStageCode[],
+  overrides: Partial<Record<PartnerOnboardingStageCode, { isEnabled?: boolean; sortOrder?: number }>>
+): PartnerOnboardingStageCode[] {
+  const candidates = PARTNER_ONBOARDING_STAGE_ORDER;
+  const enabled = candidates.filter((stage) => {
+    const ov = overrides[stage];
+    if (ov?.isEnabled !== undefined) return ov.isEnabled;
+    return baseOrder.includes(stage);
+  });
+
+  const rank = (stage: PartnerOnboardingStageCode): number => {
+    const ov = overrides[stage];
+    if (ov?.sortOrder !== undefined) return ov.sortOrder;
+    const baseIdx = baseOrder.indexOf(stage);
+    return baseIdx >= 0 ? baseIdx : 1000 + candidates.indexOf(stage);
+  };
+
+  return [...enabled].sort((a, b) => rank(a) - rank(b));
+}
+
+/** Human-readable defaults for each stage code, used whenever no admin override exists. */
+export const PARTNER_STAGE_LABELS: Record<
+  PartnerOnboardingStageCode,
+  { label: string; description: string }
+> = {
+  registration: {
+    label: 'Registration',
+    description: 'Partner submits basic organization details and accepts the platform terms.',
+  },
+  service_selection: {
+    label: 'Service selection',
+    description: 'Partner chooses which services or programs they want to offer.',
+  },
+  initial_review: {
+    label: 'Initial review',
+    description: 'Platform staff perform a first-pass review of the application.',
+  },
+  documentation: {
+    label: 'Documentation',
+    description: 'Partner uploads required compliance documents (licenses, certificates, etc.).',
+  },
+  verification: {
+    label: 'Verification',
+    description: 'Platform staff verify submitted documents and business details.',
+  },
+  agreement: {
+    label: 'Agreement',
+    description: 'Partner reviews and signs the master partnership agreement.',
+  },
+  app_access: {
+    label: 'Application access',
+    description: 'Platform staff provision technical/API access for the partner.',
+  },
+  user_setup: {
+    label: 'User setup',
+    description: 'Partner invites their team members into the portal.',
+  },
+  training: {
+    label: 'Training',
+    description: 'Partner completes onboarding training and enablement material.',
+  },
+  testing: {
+    label: 'Testing',
+    description: 'Partner runs a pilot/sandbox test of the integration or workflow.',
+  },
+  go_live: {
+    label: 'Go live',
+    description: 'Final activation step — the partner becomes fully active on the platform.',
+  },
+};
 
 export function buildInitialPartnerOnboardingState(partnerType: string) {
   const order = getPartnerOnboardingStageOrder(partnerType);
@@ -162,9 +245,10 @@ export function buildInitialPartnerOnboardingState(partnerType: string) {
 export function isPartnerOnboardingCompleteForType(
   partnerType: string,
   completedStages: string[],
-  stages?: Record<string, { status?: string }>
+  stages?: Record<string, { status?: string }>,
+  orderOverride?: readonly PartnerOnboardingStageCode[]
 ): boolean {
-  const order = getPartnerOnboardingStageOrder(partnerType);
+  const order = orderOverride ?? getPartnerOnboardingStageOrder(partnerType);
   return order.every((stage) => {
     if (completedStages.includes(stage)) return true;
     return stages?.[stage]?.status === 'skipped';

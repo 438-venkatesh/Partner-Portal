@@ -30,6 +30,7 @@ import { partnerBillingPortalRoutes } from './routes/partnerBillingPortal';
 import { partnerApiKeysPortalRoutes } from './routes/partnerApiKeysPortal';
 import { partnerWebhooksPortalRoutes } from './routes/partnerWebhooksPortal';
 import { integrationStubRoutes } from './routes/integrationStubs';
+import { partnerDirectoryRoutes } from './routes/partnerDirectory';
 import { mockDataService } from './services/mockDataService';
 import { dbPool } from './db';
 
@@ -63,6 +64,7 @@ async function start() {
     await server.register(rateLimit, { global: false });
 
     await server.register(authRoutes, { prefix: '/api/auth' });
+    await server.register(partnerDirectoryRoutes, { prefix: '/api/directory' });
     await server.register(partnerRoutes, { prefix: '/api/partners' });
     await server.register(tenantRoutes, { prefix: '/api/tenants' });
     await server.register(billingAdminRoutes, { prefix: '/api/billing' });

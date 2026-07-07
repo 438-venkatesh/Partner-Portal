@@ -17,6 +17,7 @@ import { Route as SuppliersIndexRouteImport } from './routes/suppliers/index'
 import { Route as PartnersIndexRouteImport } from './routes/partners/index'
 import { Route as PartnerOperationsIndexRouteImport } from './routes/partner-operations/index'
 import { Route as LogisticsIndexRouteImport } from './routes/logistics/index'
+import { Route as DirectoryIndexRouteImport } from './routes/directory/index'
 import { Route as BillingIndexRouteImport } from './routes/billing/index'
 import { Route as TenantsNewRouteImport } from './routes/tenants/new'
 import { Route as TenantsTenantIdRouteImport } from './routes/tenants/$tenantId'
@@ -24,6 +25,7 @@ import { Route as SuppliersPurchaseOrdersRouteImport } from './routes/suppliers/
 import { Route as SuppliersInvoicesRouteImport } from './routes/suppliers/invoices'
 import { Route as SuppliersCatalogRouteImport } from './routes/suppliers/catalog'
 import { Route as PartnersNewRouteImport } from './routes/partners/new'
+import { Route as PartnersImportRouteImport } from './routes/partners/import'
 import { Route as PartnersPartnerIdRouteImport } from './routes/partners/$partnerId'
 import { Route as PartnerVerifyEmailRouteImport } from './routes/partner/verify-email'
 import { Route as PartnerTimelinesRouteImport } from './routes/partner/timelines'
@@ -38,6 +40,8 @@ import { Route as PartnerEmployeesRouteImport } from './routes/partner/employees
 import { Route as PartnerDocumentsRouteImport } from './routes/partner/documents'
 import { Route as PartnerDashboardRouteImport } from './routes/partner/dashboard'
 import { Route as PartnerAgreementsRouteImport } from './routes/partner/agreements'
+import { Route as OnboardingSettingsRouteImport } from './routes/onboarding/settings'
+import { Route as OnboardingAnalyticsRouteImport } from './routes/onboarding/analytics'
 import { Route as LogisticsShipmentsRouteImport } from './routes/logistics/shipments'
 import { Route as PartnersPartnerIdIndexRouteImport } from './routes/partners/$partnerId/index'
 import { Route as PartnerTenantsIndexRouteImport } from './routes/partner/tenants/index'
@@ -94,6 +98,11 @@ const LogisticsIndexRoute = LogisticsIndexRouteImport.update({
   path: '/logistics/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DirectoryIndexRoute = DirectoryIndexRouteImport.update({
+  id: '/directory/',
+  path: '/directory/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BillingIndexRoute = BillingIndexRouteImport.update({
   id: '/billing/',
   path: '/billing/',
@@ -127,6 +136,11 @@ const SuppliersCatalogRoute = SuppliersCatalogRouteImport.update({
 const PartnersNewRoute = PartnersNewRouteImport.update({
   id: '/partners/new',
   path: '/partners/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PartnersImportRoute = PartnersImportRouteImport.update({
+  id: '/partners/import',
+  path: '/partners/import',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PartnersPartnerIdRoute = PartnersPartnerIdRouteImport.update({
@@ -198,6 +212,16 @@ const PartnerDashboardRoute = PartnerDashboardRouteImport.update({
 const PartnerAgreementsRoute = PartnerAgreementsRouteImport.update({
   id: '/partner/agreements',
   path: '/partner/agreements',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingSettingsRoute = OnboardingSettingsRouteImport.update({
+  id: '/onboarding/settings',
+  path: '/onboarding/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingAnalyticsRoute = OnboardingAnalyticsRouteImport.update({
+  id: '/onboarding/analytics',
+  path: '/onboarding/analytics',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LogisticsShipmentsRoute = LogisticsShipmentsRouteImport.update({
@@ -295,6 +319,8 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/logistics/shipments': typeof LogisticsShipmentsRouteWithChildren
+  '/onboarding/analytics': typeof OnboardingAnalyticsRoute
+  '/onboarding/settings': typeof OnboardingSettingsRoute
   '/partner': typeof Partner_rootRoute
   '/partner/agreements': typeof PartnerAgreementsRouteWithChildren
   '/partner/dashboard': typeof PartnerDashboardRoute
@@ -310,6 +336,7 @@ export interface FileRoutesByFullPath {
   '/partner/timelines': typeof PartnerTimelinesRouteWithChildren
   '/partner/verify-email': typeof PartnerVerifyEmailRoute
   '/partners/$partnerId': typeof PartnersPartnerIdRouteWithChildren
+  '/partners/import': typeof PartnersImportRoute
   '/partners/new': typeof PartnersNewRoute
   '/suppliers/catalog': typeof SuppliersCatalogRoute
   '/suppliers/invoices': typeof SuppliersInvoicesRouteWithChildren
@@ -317,6 +344,7 @@ export interface FileRoutesByFullPath {
   '/tenants/$tenantId': typeof TenantsTenantIdRoute
   '/tenants/new': typeof TenantsNewRoute
   '/billing': typeof BillingIndexRoute
+  '/directory': typeof DirectoryIndexRoute
   '/logistics': typeof LogisticsIndexRoute
   '/partner-operations': typeof PartnerOperationsIndexRoute
   '/partners': typeof PartnersIndexRoute
@@ -342,6 +370,8 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/logistics/shipments': typeof LogisticsShipmentsRouteWithChildren
+  '/onboarding/analytics': typeof OnboardingAnalyticsRoute
+  '/onboarding/settings': typeof OnboardingSettingsRoute
   '/partner': typeof Partner_rootRoute
   '/partner/agreements': typeof PartnerAgreementsRouteWithChildren
   '/partner/dashboard': typeof PartnerDashboardRoute
@@ -356,6 +386,7 @@ export interface FileRoutesByTo {
   '/partner/settings': typeof PartnerSettingsRoute
   '/partner/timelines': typeof PartnerTimelinesRouteWithChildren
   '/partner/verify-email': typeof PartnerVerifyEmailRoute
+  '/partners/import': typeof PartnersImportRoute
   '/partners/new': typeof PartnersNewRoute
   '/suppliers/catalog': typeof SuppliersCatalogRoute
   '/suppliers/invoices': typeof SuppliersInvoicesRouteWithChildren
@@ -363,6 +394,7 @@ export interface FileRoutesByTo {
   '/tenants/$tenantId': typeof TenantsTenantIdRoute
   '/tenants/new': typeof TenantsNewRoute
   '/billing': typeof BillingIndexRoute
+  '/directory': typeof DirectoryIndexRoute
   '/logistics': typeof LogisticsIndexRoute
   '/partner-operations': typeof PartnerOperationsIndexRoute
   '/partners': typeof PartnersIndexRoute
@@ -389,6 +421,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/logistics/shipments': typeof LogisticsShipmentsRouteWithChildren
+  '/onboarding/analytics': typeof OnboardingAnalyticsRoute
+  '/onboarding/settings': typeof OnboardingSettingsRoute
   '/partner/__root': typeof Partner_rootRoute
   '/partner/agreements': typeof PartnerAgreementsRouteWithChildren
   '/partner/dashboard': typeof PartnerDashboardRoute
@@ -404,6 +438,7 @@ export interface FileRoutesById {
   '/partner/timelines': typeof PartnerTimelinesRouteWithChildren
   '/partner/verify-email': typeof PartnerVerifyEmailRoute
   '/partners/$partnerId': typeof PartnersPartnerIdRouteWithChildren
+  '/partners/import': typeof PartnersImportRoute
   '/partners/new': typeof PartnersNewRoute
   '/suppliers/catalog': typeof SuppliersCatalogRoute
   '/suppliers/invoices': typeof SuppliersInvoicesRouteWithChildren
@@ -411,6 +446,7 @@ export interface FileRoutesById {
   '/tenants/$tenantId': typeof TenantsTenantIdRoute
   '/tenants/new': typeof TenantsNewRoute
   '/billing/': typeof BillingIndexRoute
+  '/directory/': typeof DirectoryIndexRoute
   '/logistics/': typeof LogisticsIndexRoute
   '/partner-operations/': typeof PartnerOperationsIndexRoute
   '/partners/': typeof PartnersIndexRoute
@@ -438,6 +474,8 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/logistics/shipments'
+    | '/onboarding/analytics'
+    | '/onboarding/settings'
     | '/partner'
     | '/partner/agreements'
     | '/partner/dashboard'
@@ -453,6 +491,7 @@ export interface FileRouteTypes {
     | '/partner/timelines'
     | '/partner/verify-email'
     | '/partners/$partnerId'
+    | '/partners/import'
     | '/partners/new'
     | '/suppliers/catalog'
     | '/suppliers/invoices'
@@ -460,6 +499,7 @@ export interface FileRouteTypes {
     | '/tenants/$tenantId'
     | '/tenants/new'
     | '/billing'
+    | '/directory'
     | '/logistics'
     | '/partner-operations'
     | '/partners'
@@ -485,6 +525,8 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/logistics/shipments'
+    | '/onboarding/analytics'
+    | '/onboarding/settings'
     | '/partner'
     | '/partner/agreements'
     | '/partner/dashboard'
@@ -499,6 +541,7 @@ export interface FileRouteTypes {
     | '/partner/settings'
     | '/partner/timelines'
     | '/partner/verify-email'
+    | '/partners/import'
     | '/partners/new'
     | '/suppliers/catalog'
     | '/suppliers/invoices'
@@ -506,6 +549,7 @@ export interface FileRouteTypes {
     | '/tenants/$tenantId'
     | '/tenants/new'
     | '/billing'
+    | '/directory'
     | '/logistics'
     | '/partner-operations'
     | '/partners'
@@ -531,6 +575,8 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/logistics/shipments'
+    | '/onboarding/analytics'
+    | '/onboarding/settings'
     | '/partner/__root'
     | '/partner/agreements'
     | '/partner/dashboard'
@@ -546,6 +592,7 @@ export interface FileRouteTypes {
     | '/partner/timelines'
     | '/partner/verify-email'
     | '/partners/$partnerId'
+    | '/partners/import'
     | '/partners/new'
     | '/suppliers/catalog'
     | '/suppliers/invoices'
@@ -553,6 +600,7 @@ export interface FileRouteTypes {
     | '/tenants/$tenantId'
     | '/tenants/new'
     | '/billing/'
+    | '/directory/'
     | '/logistics/'
     | '/partner-operations/'
     | '/partners/'
@@ -579,6 +627,8 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LoginRoute: typeof LoginRoute
   LogisticsShipmentsRoute: typeof LogisticsShipmentsRouteWithChildren
+  OnboardingAnalyticsRoute: typeof OnboardingAnalyticsRoute
+  OnboardingSettingsRoute: typeof OnboardingSettingsRoute
   Partner_rootRoute: typeof Partner_rootRoute
   PartnerAgreementsRoute: typeof PartnerAgreementsRouteWithChildren
   PartnerDashboardRoute: typeof PartnerDashboardRoute
@@ -594,6 +644,7 @@ export interface RootRouteChildren {
   PartnerTimelinesRoute: typeof PartnerTimelinesRouteWithChildren
   PartnerVerifyEmailRoute: typeof PartnerVerifyEmailRoute
   PartnersPartnerIdRoute: typeof PartnersPartnerIdRouteWithChildren
+  PartnersImportRoute: typeof PartnersImportRoute
   PartnersNewRoute: typeof PartnersNewRoute
   SuppliersCatalogRoute: typeof SuppliersCatalogRoute
   SuppliersInvoicesRoute: typeof SuppliersInvoicesRouteWithChildren
@@ -601,6 +652,7 @@ export interface RootRouteChildren {
   TenantsTenantIdRoute: typeof TenantsTenantIdRoute
   TenantsNewRoute: typeof TenantsNewRoute
   BillingIndexRoute: typeof BillingIndexRoute
+  DirectoryIndexRoute: typeof DirectoryIndexRoute
   LogisticsIndexRoute: typeof LogisticsIndexRoute
   PartnerOperationsIndexRoute: typeof PartnerOperationsIndexRoute
   PartnersIndexRoute: typeof PartnersIndexRoute
@@ -669,6 +721,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LogisticsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/directory/': {
+      id: '/directory/'
+      path: '/directory'
+      fullPath: '/directory'
+      preLoaderRoute: typeof DirectoryIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/billing/': {
       id: '/billing/'
       path: '/billing'
@@ -716,6 +775,13 @@ declare module '@tanstack/react-router' {
       path: '/partners/new'
       fullPath: '/partners/new'
       preLoaderRoute: typeof PartnersNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/partners/import': {
+      id: '/partners/import'
+      path: '/partners/import'
+      fullPath: '/partners/import'
+      preLoaderRoute: typeof PartnersImportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/partners/$partnerId': {
@@ -814,6 +880,20 @@ declare module '@tanstack/react-router' {
       path: '/partner/agreements'
       fullPath: '/partner/agreements'
       preLoaderRoute: typeof PartnerAgreementsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding/settings': {
+      id: '/onboarding/settings'
+      path: '/onboarding/settings'
+      fullPath: '/onboarding/settings'
+      preLoaderRoute: typeof OnboardingSettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding/analytics': {
+      id: '/onboarding/analytics'
+      path: '/onboarding/analytics'
+      fullPath: '/onboarding/analytics'
+      preLoaderRoute: typeof OnboardingAnalyticsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/logistics/shipments': {
@@ -1026,6 +1106,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRoute: LoginRoute,
   LogisticsShipmentsRoute: LogisticsShipmentsRouteWithChildren,
+  OnboardingAnalyticsRoute: OnboardingAnalyticsRoute,
+  OnboardingSettingsRoute: OnboardingSettingsRoute,
   Partner_rootRoute: Partner_rootRoute,
   PartnerAgreementsRoute: PartnerAgreementsRouteWithChildren,
   PartnerDashboardRoute: PartnerDashboardRoute,
@@ -1041,6 +1123,7 @@ const rootRouteChildren: RootRouteChildren = {
   PartnerTimelinesRoute: PartnerTimelinesRouteWithChildren,
   PartnerVerifyEmailRoute: PartnerVerifyEmailRoute,
   PartnersPartnerIdRoute: PartnersPartnerIdRouteWithChildren,
+  PartnersImportRoute: PartnersImportRoute,
   PartnersNewRoute: PartnersNewRoute,
   SuppliersCatalogRoute: SuppliersCatalogRoute,
   SuppliersInvoicesRoute: SuppliersInvoicesRouteWithChildren,
@@ -1048,6 +1131,7 @@ const rootRouteChildren: RootRouteChildren = {
   TenantsTenantIdRoute: TenantsTenantIdRoute,
   TenantsNewRoute: TenantsNewRoute,
   BillingIndexRoute: BillingIndexRoute,
+  DirectoryIndexRoute: DirectoryIndexRoute,
   LogisticsIndexRoute: LogisticsIndexRoute,
   PartnerOperationsIndexRoute: PartnerOperationsIndexRoute,
   PartnersIndexRoute: PartnersIndexRoute,

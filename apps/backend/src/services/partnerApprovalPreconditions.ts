@@ -35,7 +35,7 @@ export async function getPartnerActivationBlockers(partnerId: string): Promise<s
 
   if (flags.needsGenericOnboarding) {
     const wf = await onboardingService.getWorkflow(partnerId);
-    if (!isPartnerOnboardingComplete(wf, partner.partnerType)) {
+    if (!(await isPartnerOnboardingComplete(wf, partner.partnerType))) {
       const flowLabel = wf.flowTitle ?? 'partner onboarding';
       blockers.push(
         `Finish ${flowLabel} (all required stages for your partner type) before approving.`

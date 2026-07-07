@@ -15,6 +15,10 @@ import {
   ChevronDown,
   CreditCard,
   ClipboardCheck,
+  BarChart3,
+  Settings,
+  UploadCloud,
+  Compass,
 } from 'lucide-react';
 import { useAuthStore } from '@/lib/stores/authStore';
 import { useNavigate } from '@tanstack/react-router';
@@ -67,7 +71,11 @@ export function AdminSidebar() {
       title: 'Partner management',
       items: [
         { to: '/partner-operations', label: 'Onboarding review', icon: ClipboardCheck },
+        { to: '/onboarding/analytics', label: 'Onboarding analytics', icon: BarChart3 },
+        { to: '/onboarding/settings', label: 'Onboarding settings', icon: Settings },
         { to: '/partners', label: 'All partners', icon: Users },
+        { to: '/partners/import', label: 'Bulk import', icon: UploadCloud },
+        { to: '/directory', label: 'Partner directory', icon: Compass },
         { to: '/tenants', label: 'Tenants', icon: Building2 },
       ],
     },

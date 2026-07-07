@@ -151,4 +151,18 @@ ${reason ? `<p>Reason: ${escapeHtml(reason)}</p>` : ''}`
     );
     return send({ to, subject: `Onboarding update — ${partnerName}`, html });
   },
+
+  async sendOnboardingReminder(
+    to: string,
+    opts: { partnerName: string; stageLabel: string; idleDays: number }
+  ) {
+    const base = publicWebBaseUrl();
+    const html = wrapHtml(
+      "Let's finish setting up your account",
+      `<p>Hi there — <strong>${escapeHtml(opts.partnerName)}</strong> has been on the <strong>${escapeHtml(opts.stageLabel)}</strong> step for ${opts.idleDays} day${opts.idleDays === 1 ? '' : 's'} now.</p>
+<p>Pick up right where you left off whenever you're ready.</p>
+<p><a href="${escapeHtml(base + '/partner/onboarding')}" style="display:inline-block;padding:12px 20px;background:#2563eb;color:#fff;text-decoration:none;border-radius:8px;">Continue onboarding</a></p>`
+    );
+    return send({ to, subject: `Still there? Finish setting up ${opts.partnerName}`, html });
+  },
 };
