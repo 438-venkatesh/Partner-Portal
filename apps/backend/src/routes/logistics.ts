@@ -1,6 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { logisticsService } from '../services/logisticsService';
 import { authenticate } from '../middleware/auth';
+import { requireOperationsDbRole } from '../middleware/requireRole';
 import {
   acceptShipmentSchema,
   updateShipmentStatusSchema,
@@ -50,6 +51,7 @@ export async function logisticsRoutes(fastify: FastifyInstance) {
 
   // Accept shipment
   fastify.post('/shipments/:shipmentId/accept', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
     schema: {
       params: zodToFastifySchema(z.object({ shipmentId: z.string().uuid() })),
       body: zodToFastifySchema(acceptShipmentSchema),
@@ -65,6 +67,7 @@ export async function logisticsRoutes(fastify: FastifyInstance) {
 
   // Update shipment status
   fastify.put('/shipments/:shipmentId/status', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
     schema: {
       params: zodToFastifySchema(z.object({ shipmentId: z.string().uuid() })),
       body: zodToFastifySchema(updateShipmentStatusSchema),
@@ -80,6 +83,7 @@ export async function logisticsRoutes(fastify: FastifyInstance) {
 
   // Add tracking event
   fastify.post('/shipments/:shipmentId/tracking', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
     schema: {
       params: zodToFastifySchema(z.object({ shipmentId: z.string().uuid() })),
       body: zodToFastifySchema(z.object({
@@ -103,6 +107,7 @@ export async function logisticsRoutes(fastify: FastifyInstance) {
 
   // Upload delivery proof
   fastify.post('/shipments/:shipmentId/delivery-proof', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
     schema: {
       params: zodToFastifySchema(z.object({ shipmentId: z.string().uuid() })),
     },

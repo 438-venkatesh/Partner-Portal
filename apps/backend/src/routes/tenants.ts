@@ -1,8 +1,10 @@
 import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { authenticate } from '../middleware/auth';
+import { requireOperationsDbRole } from '../middleware/requireRole';
 import { tenantService } from '../services/tenantService';
 import { zodToFastifySchema } from '../utils/schemaConverter';
+import { logPlatformAction } from '../utils/platformAuditLogger';
 
 const createSchema = z.object({
   tenantCode: z.string().min(1).max(50),
@@ -33,12 +35,22 @@ export async function tenantRoutes(fastify: FastifyInstance) {
   fastify.post(
     '/',
     {
+      preHandler: requireOperationsDbRole('admin', 'superadmin'),
       schema: { body: zodToFastifySchema(createSchema) },
     },
     async (request, reply) => {
       const body = request.body as z.infer<typeof createSchema>;
       try {
         const row = await tenantService.create(body);
+        await logPlatformAction({
+          actorId: request.user!.userId!,
+          actorEmail: request.user!.email,
+          action: 'tenant_created',
+          entityType: 'tenant',
+          entityId: row.tenantId,
+          metadata: { tenantCode: row.tenantCode, tenantName: row.tenantName },
+          ipAddress: request.ip,
+        });
         return reply.code(201).send({ tenant: row });
       } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : 'Create failed';
@@ -63,6 +75,7 @@ export async function tenantRoutes(fastify: FastifyInstance) {
   fastify.put(
     '/:tenantId',
     {
+      preHandler: requireOperationsDbRole('admin', 'superadmin'),
       schema: {
         params: zodToFastifySchema(idParams),
         body: zodToFastifySchema(updateSchema),
@@ -73,6 +86,15 @@ export async function tenantRoutes(fastify: FastifyInstance) {
       const body = request.body as z.infer<typeof updateSchema>;
       const row = await tenantService.update(tenantId, body);
       if (!row) return reply.code(404).send({ error: 'Not found' });
+      await logPlatformAction({
+        actorId: request.user!.userId!,
+        actorEmail: request.user!.email,
+        action: 'tenant_updated',
+        entityType: 'tenant',
+        entityId: tenantId,
+        metadata: body,
+        ipAddress: request.ip,
+      });
       return reply.send({ tenant: row });
     }
   );

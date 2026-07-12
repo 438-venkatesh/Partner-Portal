@@ -56,6 +56,7 @@ import { adminAnalyticsRoutes } from './routes/adminAnalytics';
 import { reportRoutes } from './routes/reports';
 import { biExportRoutes } from './routes/biExport';
 import { realtimeRoutes } from './routes/realtime';
+import { adminGovernanceRoutes } from './routes/adminGovernance';
 import { mockDataService } from './services/mockDataService';
 import { dbPool } from './db';
 
@@ -130,6 +131,7 @@ async function start() {
     await server.register(reportRoutes, { prefix: '/api/reports' });
     await server.register(biExportRoutes, { prefix: '/api/bi' });
     await server.register(realtimeRoutes, { prefix: '/api/realtime' });
+    await server.register(adminGovernanceRoutes, { prefix: '/api/admin-governance' });
 
     await server.register(partnerAuthRoutes, { prefix: '/api/partner-auth' });
     server.post('/api/partner-auth/resend-verification', handleResendVerification);

@@ -28,6 +28,7 @@ import {
   Megaphone,
   ShieldCheck,
   LineChart,
+  KeyRound,
 } from 'lucide-react';
 import { useAuthStore } from '@/lib/stores/authStore';
 import { useNavigate } from '@tanstack/react-router';
@@ -79,6 +80,7 @@ export function AdminSidebar() {
         { to: '/comarketing', label: 'Co-marketing', icon: Megaphone },
         { to: '/compliance', label: 'Compliance', icon: ShieldCheck },
         { to: '/billing', label: 'Billing', icon: CreditCard },
+        { to: '/admin-governance', label: 'Admin & governance', icon: KeyRound },
       ],
     },
     {

@@ -21,6 +21,7 @@ export * from './training';
 export * from './enablementContent';
 export * from './comarketing';
 export * from './compliance';
+export * from './governance';
 
 // Re-export for convenience
 import { partners, partnerUsers } from './partners';
@@ -81,6 +82,7 @@ import {
 import { salesPlaybooks, marketingAssets } from './enablementContent';
 import { coMarketingPages, referralLinks } from './comarketing';
 import { agreementReminderLog, dataErasureRequests } from './compliance';
+import { platformAuditLogs, customFieldDefinitions, partnerAutoSuspendRules } from './governance';
 
 export const schema = {
   partners,
@@ -144,4 +146,7 @@ export const schema = {
   referralLinks,
   agreementReminderLog,
   dataErasureRequests,
+  platformAuditLogs,
+  customFieldDefinitions,
+  partnerAutoSuspendRules,
 };

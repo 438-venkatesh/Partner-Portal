@@ -25,6 +25,7 @@
     "deals:expire-protections": "tsx scripts/expire-deal-protections.ts",
     "contracts:send-agreement-reminders": "tsx scripts/send-agreement-reminders.ts",
     "billing:run-cycle": "tsx scripts/run-billing-cycle.ts",
+    "governance:run-auto-suspend-check": "tsx scripts/run-auto-suspend-check.ts",
     "test": "vitest run",
     "test:upload": "tsx scripts/test-document-upload.ts"
   },

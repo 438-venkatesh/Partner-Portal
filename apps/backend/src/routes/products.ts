@@ -1,6 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { productService } from '../services/productService';
 import { authenticate } from '../middleware/auth';
+import { requireOperationsDbRole } from '../middleware/requireRole';
 import { z } from 'zod';
 import { zodToFastifySchema } from '../utils/schemaConverter';
 
@@ -32,6 +33,7 @@ export async function productRoutes(fastify: FastifyInstance) {
 
   // Create product
   fastify.post('/suppliers/:supplierId/products', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
     schema: {
       params: zodToFastifySchema(z.object({ supplierId: z.string().uuid() })),
       body: zodToFastifySchema(z.object({
@@ -62,6 +64,7 @@ export async function productRoutes(fastify: FastifyInstance) {
 
   // Update product
   fastify.put('/products/:productId', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
     schema: {
       params: zodToFastifySchema(z.object({ productId: z.string().uuid() })),
       body: zodToFastifySchema(z.object({
@@ -89,6 +92,7 @@ export async function productRoutes(fastify: FastifyInstance) {
 
   // Delete product
   fastify.delete('/products/:productId', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
     schema: {
       params: zodToFastifySchema(z.object({ productId: z.string().uuid() })),
     },
@@ -99,6 +103,7 @@ export async function productRoutes(fastify: FastifyInstance) {
 
   // Share catalog with tenant
   fastify.post('/suppliers/:supplierId/share-catalog', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
     schema: {
       params: zodToFastifySchema(z.object({ supplierId: z.string().uuid() })),
       body: zodToFastifySchema(z.object({

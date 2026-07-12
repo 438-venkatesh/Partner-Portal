@@ -146,6 +146,63 @@ export const operationsAuthService = {
       operationsRole: created.role,
     };
   },
+
+  async listStaff() {
+    return db
+      .select({
+        adminId: adminUsers.adminId,
+        email: adminUsers.email,
+        role: adminUsers.role,
+        isActive: adminUsers.isActive,
+        createdAt: adminUsers.createdAt,
+      })
+      .from(adminUsers)
+      .orderBy(adminUsers.createdAt);
+  },
+
+  async countActiveSuperadmins(excludingAdminId?: string): Promise<number> {
+    const rows = await db
+      .select({ adminId: adminUsers.adminId })
+      .from(adminUsers)
+      .where(and(eq(adminUsers.role, 'superadmin'), eq(adminUsers.isActive, true)));
+    return rows.filter((r) => r.adminId !== excludingAdminId).length;
+  },
+
+  async updateStaffRole(adminId: string, role: AdminRole) {
+    const [existing] = await db.select().from(adminUsers).where(eq(adminUsers.adminId, adminId)).limit(1);
+    if (!existing) throw new Error('Admin user not found');
+
+    if (existing.role === 'superadmin' && role !== 'superadmin') {
+      const remaining = await this.countActiveSuperadmins(adminId);
+      if (remaining === 0) throw new Error('Cannot demote the last active superadmin');
+    }
+
+    const [updated] = await db
+      .update(adminUsers)
+      .set({ role, updatedAt: new Date() })
+      .where(eq(adminUsers.adminId, adminId))
+      .returning();
+    if (!updated) throw new Error('Admin user not found');
+    return updated;
+  },
+
+  async setStaffActive(adminId: string, isActive: boolean) {
+    const [existing] = await db.select().from(adminUsers).where(eq(adminUsers.adminId, adminId)).limit(1);
+    if (!existing) throw new Error('Admin user not found');
+
+    if (!isActive && existing.role === 'superadmin') {
+      const remaining = await this.countActiveSuperadmins(adminId);
+      if (remaining === 0) throw new Error('Cannot deactivate the last active superadmin');
+    }
+
+    const [updated] = await db
+      .update(adminUsers)
+      .set({ isActive, updatedAt: new Date() })
+      .where(eq(adminUsers.adminId, adminId))
+      .returning();
+    if (!updated) throw new Error('Admin user not found');
+    return updated;
+  },
 };
 
 function accessTokenPayload(admin: {

@@ -1,6 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { supplierService } from '../services/supplierService';
 import { authenticate } from '../middleware/auth';
+import { requireOperationsDbRole } from '../middleware/requireRole';
 import {
   acknowledgePOSchema,
   createPurchaseOrderSchema,
@@ -49,6 +50,7 @@ export async function supplierRoutes(fastify: FastifyInstance) {
 
   // Acknowledge purchase order
   fastify.post('/purchase-orders/:poId/acknowledge', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
     schema: {
       params: zodToFastifySchema(z.object({ poId: z.string().uuid() })),
       body: zodToFastifySchema(acknowledgePOSchema),
@@ -64,6 +66,7 @@ export async function supplierRoutes(fastify: FastifyInstance) {
 
   // Update PO status
   fastify.put('/purchase-orders/:poId/status', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
     schema: {
       params: zodToFastifySchema(z.object({ poId: z.string().uuid() })),
       body: zodToFastifySchema(z.object({

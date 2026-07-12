@@ -10,6 +10,7 @@ import {
   markBillingInvoicePaidSchema,
 } from '@partner-portal/common';
 import { zodToFastifySchema } from '../utils/schemaConverter';
+import { logPlatformAction } from '../utils/platformAuditLogger';
 
 export async function billingAdminRoutes(fastify: FastifyInstance) {
   fastify.addHook('onRequest', authenticate);
@@ -27,6 +28,15 @@ export async function billingAdminRoutes(fastify: FastifyInstance) {
     },
     async (request, reply) => {
       const plan = await billingService.createPlan(request.body as any);
+      await logPlatformAction({
+        actorId: request.user!.userId!,
+        actorEmail: request.user!.email,
+        action: 'billing_plan_created',
+        entityType: 'billing_plan',
+        entityId: plan.planId,
+        metadata: { planName: plan.planName },
+        ipAddress: request.ip,
+      });
       return reply.code(201).send({ plan });
     }
   );
@@ -46,6 +56,15 @@ export async function billingAdminRoutes(fastify: FastifyInstance) {
         request.body as any
       );
       if (!plan) return reply.code(404).send({ message: 'Plan not found' });
+      await logPlatformAction({
+        actorId: request.user!.userId!,
+        actorEmail: request.user!.email,
+        action: 'billing_plan_updated',
+        entityType: 'billing_plan',
+        entityId: plan.planId,
+        metadata: request.body as Record<string, unknown>,
+        ipAddress: request.ip,
+      });
       return reply.send({ plan });
     }
   );

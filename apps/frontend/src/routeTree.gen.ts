@@ -26,6 +26,7 @@ import { Route as ComplianceIndexRouteImport } from './routes/compliance/index'
 import { Route as ComarketingIndexRouteImport } from './routes/comarketing/index'
 import { Route as BillingIndexRouteImport } from './routes/billing/index'
 import { Route as AnalyticsIndexRouteImport } from './routes/analytics/index'
+import { Route as AdminGovernanceIndexRouteImport } from './routes/admin-governance/index'
 import { Route as AccountMappingIndexRouteImport } from './routes/account-mapping/index'
 import { Route as TenantsNewRouteImport } from './routes/tenants/new'
 import { Route as TenantsTenantIdRouteImport } from './routes/tenants/$tenantId'
@@ -155,6 +156,11 @@ const BillingIndexRoute = BillingIndexRouteImport.update({
 const AnalyticsIndexRoute = AnalyticsIndexRouteImport.update({
   id: '/analytics/',
   path: '/analytics/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminGovernanceIndexRoute = AdminGovernanceIndexRouteImport.update({
+  id: '/admin-governance/',
+  path: '/admin-governance/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AccountMappingIndexRoute = AccountMappingIndexRouteImport.update({
@@ -434,6 +440,7 @@ export interface FileRoutesByFullPath {
   '/tenants/$tenantId': typeof TenantsTenantIdRoute
   '/tenants/new': typeof TenantsNewRoute
   '/account-mapping': typeof AccountMappingIndexRoute
+  '/admin-governance': typeof AdminGovernanceIndexRoute
   '/analytics': typeof AnalyticsIndexRoute
   '/billing': typeof BillingIndexRoute
   '/comarketing': typeof ComarketingIndexRoute
@@ -498,6 +505,7 @@ export interface FileRoutesByTo {
   '/tenants/$tenantId': typeof TenantsTenantIdRoute
   '/tenants/new': typeof TenantsNewRoute
   '/account-mapping': typeof AccountMappingIndexRoute
+  '/admin-governance': typeof AdminGovernanceIndexRoute
   '/analytics': typeof AnalyticsIndexRoute
   '/billing': typeof BillingIndexRoute
   '/comarketing': typeof ComarketingIndexRoute
@@ -564,6 +572,7 @@ export interface FileRoutesById {
   '/tenants/$tenantId': typeof TenantsTenantIdRoute
   '/tenants/new': typeof TenantsNewRoute
   '/account-mapping/': typeof AccountMappingIndexRoute
+  '/admin-governance/': typeof AdminGovernanceIndexRoute
   '/analytics/': typeof AnalyticsIndexRoute
   '/billing/': typeof BillingIndexRoute
   '/comarketing/': typeof ComarketingIndexRoute
@@ -631,6 +640,7 @@ export interface FileRouteTypes {
     | '/tenants/$tenantId'
     | '/tenants/new'
     | '/account-mapping'
+    | '/admin-governance'
     | '/analytics'
     | '/billing'
     | '/comarketing'
@@ -695,6 +705,7 @@ export interface FileRouteTypes {
     | '/tenants/$tenantId'
     | '/tenants/new'
     | '/account-mapping'
+    | '/admin-governance'
     | '/analytics'
     | '/billing'
     | '/comarketing'
@@ -760,6 +771,7 @@ export interface FileRouteTypes {
     | '/tenants/$tenantId'
     | '/tenants/new'
     | '/account-mapping/'
+    | '/admin-governance/'
     | '/analytics/'
     | '/billing/'
     | '/comarketing/'
@@ -826,6 +838,7 @@ export interface RootRouteChildren {
   TenantsTenantIdRoute: typeof TenantsTenantIdRoute
   TenantsNewRoute: typeof TenantsNewRoute
   AccountMappingIndexRoute: typeof AccountMappingIndexRoute
+  AdminGovernanceIndexRoute: typeof AdminGovernanceIndexRoute
   AnalyticsIndexRoute: typeof AnalyticsIndexRoute
   BillingIndexRoute: typeof BillingIndexRoute
   ComarketingIndexRoute: typeof ComarketingIndexRoute
@@ -964,6 +977,13 @@ declare module '@tanstack/react-router' {
       path: '/analytics'
       fullPath: '/analytics'
       preLoaderRoute: typeof AnalyticsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin-governance/': {
+      id: '/admin-governance/'
+      path: '/admin-governance'
+      fullPath: '/admin-governance'
+      preLoaderRoute: typeof AdminGovernanceIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/account-mapping/': {
@@ -1417,6 +1437,7 @@ const rootRouteChildren: RootRouteChildren = {
   TenantsTenantIdRoute: TenantsTenantIdRoute,
   TenantsNewRoute: TenantsNewRoute,
   AccountMappingIndexRoute: AccountMappingIndexRoute,
+  AdminGovernanceIndexRoute: AdminGovernanceIndexRoute,
   AnalyticsIndexRoute: AnalyticsIndexRoute,
   BillingIndexRoute: BillingIndexRoute,
   ComarketingIndexRoute: ComarketingIndexRoute,

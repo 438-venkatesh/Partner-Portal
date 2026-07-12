@@ -98,6 +98,7 @@ export async function partnerRoutes(fastify: FastifyInstance) {
   fastify.post(
     '/:partnerId/agreements',
     {
+      preHandler: requireOperationsDbRole('admin', 'superadmin'),
       schema: {
         params: zodToFastifySchema(partnerIdParamsSchema),
         body: zodToFastifySchema(createAgreementSchema),
@@ -122,6 +123,7 @@ export async function partnerRoutes(fastify: FastifyInstance) {
   fastify.patch(
     '/:partnerId/agreements/:agreementId',
     {
+      preHandler: requireOperationsDbRole('admin', 'superadmin'),
       schema: {
         params: zodToFastifySchema(
           partnerIdParamsSchema.extend({ agreementId: z.string().uuid() })
@@ -166,6 +168,7 @@ export async function partnerRoutes(fastify: FastifyInstance) {
   fastify.patch(
     '/:partnerId/agreements/:agreementId/status',
     {
+      preHandler: requireOperationsDbRole('admin', 'superadmin'),
       schema: {
         params: zodToFastifySchema(
           partnerIdParamsSchema.extend({ agreementId: z.string().uuid() })
@@ -204,6 +207,7 @@ export async function partnerRoutes(fastify: FastifyInstance) {
   fastify.delete(
     '/:partnerId/agreements/:agreementId',
     {
+      preHandler: requireOperationsDbRole('admin', 'superadmin'),
       schema: {
         params: zodToFastifySchema(
           partnerIdParamsSchema.extend({ agreementId: z.string().uuid() })
@@ -352,6 +356,7 @@ export async function partnerRoutes(fastify: FastifyInstance) {
   fastify.patch(
     '/:partnerId/business-plans/:planId',
     {
+      preHandler: requireOperationsDbRole('admin', 'superadmin'),
       schema: {
         params: zodToFastifySchema(partnerIdParamsSchema.extend({ planId: z.string().uuid() })),
         body: zodToFastifySchema(updateBusinessPlanSchema),
@@ -452,6 +457,7 @@ export async function partnerRoutes(fastify: FastifyInstance) {
 
   // Create partner
   fastify.post('/', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
     schema: {
       body: zodToFastifySchema(createPartnerSchema),
     },
@@ -462,6 +468,7 @@ export async function partnerRoutes(fastify: FastifyInstance) {
 
   // Update partner
   fastify.put('/:partnerId', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
     schema: {
       params: zodToFastifySchema(partnerIdParamsSchema),
       body: zodToFastifySchema(updatePartnerSchema),

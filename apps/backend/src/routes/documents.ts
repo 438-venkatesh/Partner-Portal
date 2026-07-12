@@ -14,7 +14,7 @@ export async function documentRoutes(fastify: FastifyInstance) {
   fastify.addHook('onRequest', authenticate);
 
   // Upload document
-  fastify.post('/upload', async (request, reply) => {
+  fastify.post('/upload', { preHandler: requireOperationsDbRole('admin', 'superadmin') }, async (request, reply) => {
     if (!request.isMultipart()) {
       return reply.code(400).send({ message: 'Expected multipart/form-data' });
     }

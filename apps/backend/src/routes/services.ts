@@ -117,6 +117,7 @@ export async function serviceRoutes(fastify: FastifyInstance) {
 
   // Create service relationship
   fastify.post('/relationships', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
     schema: {
       body: zodToFastifySchema(
         z
@@ -156,6 +157,7 @@ export async function serviceRoutes(fastify: FastifyInstance) {
 
   // Update service relationship
   fastify.put('/relationships/:relationshipId', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
     schema: {
       params: zodToFastifySchema(z.object({ relationshipId: z.string().uuid() })),
       body: zodToFastifySchema(z.object({
@@ -180,6 +182,7 @@ export async function serviceRoutes(fastify: FastifyInstance) {
 
   // Approve service relationship (by tenant admin, partner admin, or platform admin)
   fastify.post('/relationships/:relationshipId/approve', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
     schema: {
       params: zodToFastifySchema(z.object({ relationshipId: z.string().uuid() })),
       body: zodToFastifySchema(z.object({
@@ -199,6 +202,7 @@ export async function serviceRoutes(fastify: FastifyInstance) {
 
   // Terminate service relationship
   fastify.post('/relationships/:relationshipId/terminate', {
+    preHandler: requireOperationsDbRole('admin', 'superadmin'),
     schema: {
       params: zodToFastifySchema(z.object({ relationshipId: z.string().uuid() })),
       body: zodToFastifySchema(z.object({
