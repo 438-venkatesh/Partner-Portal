@@ -27,6 +27,7 @@ import {
   GraduationCap,
   Megaphone,
   ShieldCheck,
+  LineChart,
 } from 'lucide-react';
 import { useAuthStore } from '@/lib/stores/authStore';
 import { useNavigate } from '@tanstack/react-router';
@@ -72,6 +73,7 @@ export function AdminSidebar() {
       title: 'Main',
       items: [
         { to: '/partners', label: 'Dashboard', icon: LayoutDashboard },
+        { to: '/analytics', label: 'Analytics', icon: LineChart },
         { to: '/revenue', label: 'Deals & revenue', icon: DollarSign },
         { to: '/enablement', label: 'Enablement', icon: GraduationCap },
         { to: '/comarketing', label: 'Co-marketing', icon: Megaphone },

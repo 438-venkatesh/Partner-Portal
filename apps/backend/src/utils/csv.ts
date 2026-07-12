@@ -61,3 +61,16 @@ export function parseCsvWithHeader(input: string): Record<string, string>[] {
     return obj;
   });
 }
+
+function csvEscape(value: unknown): string {
+  if (value === null || value === undefined) return '';
+  const s = value instanceof Date ? value.toISOString() : String(value);
+  return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+}
+
+/** Serializes an array of flat objects to RFC 4180 CSV text, columns in the given order. */
+export function toCsv(rows: Record<string, unknown>[], columns: string[]): string {
+  const header = columns.map(csvEscape).join(',');
+  const body = rows.map((row) => columns.map((col) => csvEscape(row[col])).join(','));
+  return [header, ...body].join('\n');
+}

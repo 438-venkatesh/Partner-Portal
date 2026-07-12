@@ -4,6 +4,7 @@ import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import multipart from '@fastify/multipart';
 import rateLimit from '@fastify/rate-limit';
+import websocket from '@fastify/websocket';
 import { validateEnv } from './config/env';
 import { authRoutes } from './routes/auth';
 import { partnerRoutes } from './routes/partners';
@@ -51,6 +52,10 @@ import { partnerComarketingPortalRoutes } from './routes/partnerComarketingPorta
 import { publicComarketingRoutes } from './routes/publicComarketing';
 import { dataPrivacyRoutes } from './routes/dataPrivacy';
 import { partnerPrivacyPortalRoutes } from './routes/partnerPrivacyPortal';
+import { adminAnalyticsRoutes } from './routes/adminAnalytics';
+import { reportRoutes } from './routes/reports';
+import { biExportRoutes } from './routes/biExport';
+import { realtimeRoutes } from './routes/realtime';
 import { mockDataService } from './services/mockDataService';
 import { dbPool } from './db';
 
@@ -80,6 +85,7 @@ async function start() {
       credentials: true,
     });
     await server.register(multipart);
+    await server.register(websocket);
 
     await server.register(rateLimit, { global: false });
 
@@ -120,6 +126,10 @@ async function start() {
     await server.register(publicComarketingRoutes, { prefix: '/api/co-marketing' });
     await server.register(dataPrivacyRoutes, { prefix: '/api/privacy' });
     await server.register(partnerPrivacyPortalRoutes, { prefix: '/api/partner-privacy' });
+    await server.register(adminAnalyticsRoutes, { prefix: '/api/admin-analytics' });
+    await server.register(reportRoutes, { prefix: '/api/reports' });
+    await server.register(biExportRoutes, { prefix: '/api/bi' });
+    await server.register(realtimeRoutes, { prefix: '/api/realtime' });
 
     await server.register(partnerAuthRoutes, { prefix: '/api/partner-auth' });
     server.post('/api/partner-auth/resend-verification', handleResendVerification);

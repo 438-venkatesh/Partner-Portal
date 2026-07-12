@@ -5,6 +5,7 @@ import { logPartnerActivity } from '../utils/activityLogger';
 import { notificationService } from './notificationService';
 import { commissionService } from './commissionService';
 import { incentiveService } from './incentiveService';
+import { realtimeBroadcaster } from '../realtime/broadcaster';
 import type { RegisterDealInput } from '@partner-portal/common';
 
 /** How long an approved deal is protected from being claimed by another partner. */
@@ -156,6 +157,14 @@ export const dealService = {
       type: 'deal_resolved',
       title: `Deal ${outcome}: ${deal.dealName}`,
       body: outcome === 'won' ? 'Congratulations — commission is being calculated.' : 'Better luck next time.',
+    });
+
+    realtimeBroadcaster.broadcast({
+      type: 'deal_resolved',
+      dealId: updated.dealId,
+      partnerId: updated.partnerId,
+      outcome,
+      actualValue: updated.actualValue,
     });
 
     return updated;

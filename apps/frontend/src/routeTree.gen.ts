@@ -25,6 +25,7 @@ import { Route as DirectoryIndexRouteImport } from './routes/directory/index'
 import { Route as ComplianceIndexRouteImport } from './routes/compliance/index'
 import { Route as ComarketingIndexRouteImport } from './routes/comarketing/index'
 import { Route as BillingIndexRouteImport } from './routes/billing/index'
+import { Route as AnalyticsIndexRouteImport } from './routes/analytics/index'
 import { Route as AccountMappingIndexRouteImport } from './routes/account-mapping/index'
 import { Route as TenantsNewRouteImport } from './routes/tenants/new'
 import { Route as TenantsTenantIdRouteImport } from './routes/tenants/$tenantId'
@@ -149,6 +150,11 @@ const ComarketingIndexRoute = ComarketingIndexRouteImport.update({
 const BillingIndexRoute = BillingIndexRouteImport.update({
   id: '/billing/',
   path: '/billing/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnalyticsIndexRoute = AnalyticsIndexRouteImport.update({
+  id: '/analytics/',
+  path: '/analytics/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AccountMappingIndexRoute = AccountMappingIndexRouteImport.update({
@@ -428,6 +434,7 @@ export interface FileRoutesByFullPath {
   '/tenants/$tenantId': typeof TenantsTenantIdRoute
   '/tenants/new': typeof TenantsNewRoute
   '/account-mapping': typeof AccountMappingIndexRoute
+  '/analytics': typeof AnalyticsIndexRoute
   '/billing': typeof BillingIndexRoute
   '/comarketing': typeof ComarketingIndexRoute
   '/compliance': typeof ComplianceIndexRoute
@@ -491,6 +498,7 @@ export interface FileRoutesByTo {
   '/tenants/$tenantId': typeof TenantsTenantIdRoute
   '/tenants/new': typeof TenantsNewRoute
   '/account-mapping': typeof AccountMappingIndexRoute
+  '/analytics': typeof AnalyticsIndexRoute
   '/billing': typeof BillingIndexRoute
   '/comarketing': typeof ComarketingIndexRoute
   '/compliance': typeof ComplianceIndexRoute
@@ -556,6 +564,7 @@ export interface FileRoutesById {
   '/tenants/$tenantId': typeof TenantsTenantIdRoute
   '/tenants/new': typeof TenantsNewRoute
   '/account-mapping/': typeof AccountMappingIndexRoute
+  '/analytics/': typeof AnalyticsIndexRoute
   '/billing/': typeof BillingIndexRoute
   '/comarketing/': typeof ComarketingIndexRoute
   '/compliance/': typeof ComplianceIndexRoute
@@ -622,6 +631,7 @@ export interface FileRouteTypes {
     | '/tenants/$tenantId'
     | '/tenants/new'
     | '/account-mapping'
+    | '/analytics'
     | '/billing'
     | '/comarketing'
     | '/compliance'
@@ -685,6 +695,7 @@ export interface FileRouteTypes {
     | '/tenants/$tenantId'
     | '/tenants/new'
     | '/account-mapping'
+    | '/analytics'
     | '/billing'
     | '/comarketing'
     | '/compliance'
@@ -749,6 +760,7 @@ export interface FileRouteTypes {
     | '/tenants/$tenantId'
     | '/tenants/new'
     | '/account-mapping/'
+    | '/analytics/'
     | '/billing/'
     | '/comarketing/'
     | '/compliance/'
@@ -814,6 +826,7 @@ export interface RootRouteChildren {
   TenantsTenantIdRoute: typeof TenantsTenantIdRoute
   TenantsNewRoute: typeof TenantsNewRoute
   AccountMappingIndexRoute: typeof AccountMappingIndexRoute
+  AnalyticsIndexRoute: typeof AnalyticsIndexRoute
   BillingIndexRoute: typeof BillingIndexRoute
   ComarketingIndexRoute: typeof ComarketingIndexRoute
   ComplianceIndexRoute: typeof ComplianceIndexRoute
@@ -944,6 +957,13 @@ declare module '@tanstack/react-router' {
       path: '/billing'
       fullPath: '/billing'
       preLoaderRoute: typeof BillingIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/analytics/': {
+      id: '/analytics/'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AnalyticsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/account-mapping/': {
@@ -1397,6 +1417,7 @@ const rootRouteChildren: RootRouteChildren = {
   TenantsTenantIdRoute: TenantsTenantIdRoute,
   TenantsNewRoute: TenantsNewRoute,
   AccountMappingIndexRoute: AccountMappingIndexRoute,
+  AnalyticsIndexRoute: AnalyticsIndexRoute,
   BillingIndexRoute: BillingIndexRoute,
   ComarketingIndexRoute: ComarketingIndexRoute,
   ComplianceIndexRoute: ComplianceIndexRoute,

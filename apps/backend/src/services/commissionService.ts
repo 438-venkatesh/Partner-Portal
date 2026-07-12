@@ -3,6 +3,7 @@ import { db } from '../db';
 import { commissionPlans, commissionRecords, partners } from '../db/schema';
 import { notificationService } from './notificationService';
 import { logPartnerActivity } from '../utils/activityLogger';
+import { realtimeBroadcaster } from '../realtime/broadcaster';
 import type { CreateCommissionPlanInput } from '@partner-portal/common';
 
 const TIER_RANK: Record<string, number> = { bronze: 0, silver: 1, gold: 2, platinum: 3 };
@@ -207,6 +208,13 @@ export const commissionService = {
       .set({ status: 'paid', paidAt: new Date(), paidReference: reference })
       .where(and(inArray(commissionRecords.recordId, recordIds), eq(commissionRecords.status, 'approved')))
       .returning();
+
+    realtimeBroadcaster.broadcast({
+      type: 'commissions_paid',
+      recordIds: rows.map((r) => r.recordId),
+      totalAmount: rows.reduce((sum, r) => sum + Number(r.amount), 0),
+    });
+
     return rows;
   },
 

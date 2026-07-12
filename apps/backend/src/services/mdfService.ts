@@ -2,6 +2,7 @@ import { and, desc, eq, inArray, sql } from 'drizzle-orm';
 import { db } from '../db';
 import { mdfFunds, mdfRequests, deals, partners } from '../db/schema';
 import { notificationService } from './notificationService';
+import { realtimeBroadcaster } from '../realtime/broadcaster';
 import type { CreateMdfFundInput, CreateMdfRequestInput } from '@partner-portal/common';
 
 export const mdfService = {
@@ -110,6 +111,7 @@ export const mdfService = {
         title: `MDF request approved: ${request.campaignName}`,
         body: `Approved for ${amount}. Submit proof of expense to claim it.`,
       });
+      realtimeBroadcaster.broadcast({ type: 'mdf_reviewed', requestId, approved: true, amount });
       return updated;
     }
 
@@ -124,6 +126,7 @@ export const mdfService = {
       title: `MDF request rejected: ${request.campaignName}`,
       body: rejectionReason ?? 'No reason given.',
     });
+    realtimeBroadcaster.broadcast({ type: 'mdf_reviewed', requestId, approved: false });
     return updated;
   },
 

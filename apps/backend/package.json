@@ -32,8 +32,10 @@
     "@fastify/cors": "^11.1.0",
     "@fastify/multipart": "^9.3.0",
     "@fastify/rate-limit": "^10.3.0",
+    "@fastify/websocket": "^11.3.0",
     "@partner-portal/common": "workspace:*",
     "@types/bcryptjs": "^3.0.0",
+    "@types/ws": "^8.18.1",
     "bcryptjs": "^3.0.3",
     "cloudinary": "^2.10.0",
     "dotenv": "^16.4.1",
@@ -44,6 +46,7 @@
     "pg": "^8.11.3",
     "pino": "^8.19.0",
     "pino-pretty": "^10.3.1",
+    "ws": "^8.21.0",
     "zod": "^3.22.4",
     "zod-to-json-schema": "^3.25.0"
   },

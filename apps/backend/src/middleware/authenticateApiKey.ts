@@ -29,6 +29,12 @@ export async function authenticateApiKey(request: FastifyRequest, reply: Fastify
     if (ok) {
       request.apiPartnerId = row.partnerId;
       request.apiKeyId = row.keyId;
+      db.update(partnerApiKeys)
+        .set({ lastUsedAt: new Date() })
+        .where(eq(partnerApiKeys.keyId, row.keyId))
+        .catch(() => {
+          /* non-fatal — never block a request on a bookkeeping write */
+        });
       return;
     }
   }
