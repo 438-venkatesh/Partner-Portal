@@ -121,7 +121,7 @@ for i, pill in enumerate(["LangGraph", "Gemini 2.5 Flash", "FAISS", "SQLite", "S
     add_text(s, pill, x + Inches(0.05), Inches(5.1), Inches(2.0), Inches(0.45),
              font_size=Pt(13), color=ACCENT2, align=PP_ALIGN.CENTER)
 
-add_text(s, "Project by Venkatesh Ponnuru",
+add_text(s, "Project by K.Y.Sagar",
          Inches(0.5), Inches(6.3), Inches(8), Inches(0.45),
          font_size=Pt(13), color=LIGHT_GRAY)
 slide_number(s, 1)
